@@ -1,0 +1,17 @@
+Local modifications:
+
+* Remove the following:
+- com/android/email/activity
+- com/android/email/provider
+- com/android/email/service
+- com/android/exchange
+
+* Remove all dependencies on resources.
+
+* Remove all but IMAP support.
+
+* Changed ImapStore.java#fetchInternal() to fetch message body that
+are keyed with a prefix "BODY[]" instead of just "BODY[". This is to
+avoid treating "BODY[HEADER.FIELDS (...)]' as the content body.
+
+* Added implementation of digest authentication.

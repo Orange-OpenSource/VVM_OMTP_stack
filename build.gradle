@@ -1,0 +1,19 @@
+apply plugin: 'android-library'
+
+android {
+    compileSdkVersion 14
+    buildToolsVersion "18.1.0"
+
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = [
+                'src/main/java',
+                'src/main/deps/email/src',
+                'src/main/deps/jsr305/src'
+            ]
+        }
+
+        instrumentTest.setRoot('src/instrumentTest')
+    }
+}
