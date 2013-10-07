@@ -106,6 +106,11 @@ public class StackDependencyResolverImpl implements StackDependencyResolver {
 		return sInstance;
 	}
 
+    public static synchronized  StackDependencyResolverImpl reset(final Context appContext) {
+        sInstance = null;
+        return StackDependencyResolverImpl.initialize(appContext);
+    }
+
 	/**
 	 * Retrieve the singleton instance of the dependency resolver.
 	 * 

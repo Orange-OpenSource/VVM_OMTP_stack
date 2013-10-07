@@ -29,6 +29,15 @@ public class SourceInterfaceImpl implements SourceInterface {
 		mDependencyResolver = StackDependencyResolverImpl.initialize(context);
 	}
 
+    public SourceInterfaceImpl(Context applicationContext, boolean resetSourceInterface) {
+        if(resetSourceInterface) {
+            mDependencyResolver = StackDependencyResolverImpl.reset(applicationContext);
+        }
+        else {
+            mDependencyResolver = StackDependencyResolverImpl.initialize(applicationContext);
+        }
+    }
+
 	/*
 	 * (non-Javadoc)
 	 * 
