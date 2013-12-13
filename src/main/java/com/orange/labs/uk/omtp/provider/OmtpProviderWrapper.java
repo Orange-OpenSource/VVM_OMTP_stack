@@ -25,41 +25,41 @@ import javax.annotation.Nullable;
  *	of the current SIM and gives access to the associated {@link OmtpProviderInfo} if one exists.
  */
 public interface OmtpProviderWrapper {
-	
-	/**
-	 * @see OmtpProviderStore#getProviderInfoWithNetworkOperator(String)
-	 */
-	@Nullable
-	public OmtpProviderInfo getProviderInfo();
-	
-	/**
-	 * Insert in the storage the provided list of {@link OmtpProviderInfo}.
-	 * @return 
-	 * 
-	 * @see OmtpProviderStore#updateProviderInfo(OmtpProviderInfo)
-	 */
-	public boolean updateProvidersInfo(ArrayList<OmtpProviderInfo> infos);
-	
-	/**
-	 * Insert/update in the storage the provided {@link OmtpProviderInfo}.
-	 * @return 
-	 * 
-	 * @see OmtpProviderStore#updateProviderInfo(OmtpProviderInfo)
-	 */
-	public boolean updateProviderInfo(OmtpProviderInfo infos);
 
-	/**
-	 * @see OmtpProviderStore#getSupportedProviders()
-	 */
-	public List<OmtpProviderInfo> getSupportedProviders();
+    /**
+     * @see OmtpProviderStore#getProviderInfoWithNetworkOperator(String)
+     */
+    @Nullable
+    public OmtpProviderInfo getProviderInfo();
+
+    /**
+     * Insert in the storage the provided list of {@link OmtpProviderInfo}.
+     * @return
+     *
+     * @see OmtpProviderStore#updateProviderInfo(OmtpProviderInfo)
+     */
+    public boolean updateProvidersInfo(ArrayList<OmtpProviderInfo> infos);
+
+    /**
+     * Insert/update in the storage the provided {@link OmtpProviderInfo}.
+     * @return
+     *
+     * @see OmtpProviderStore#updateProviderInfo(OmtpProviderInfo)
+     */
+    public boolean updateProviderInfo(OmtpProviderInfo infos);
+
+    /**
+     * @see OmtpProviderStore#getSupportedProviders()
+     */
+    public List<OmtpProviderInfo> getSupportedProviders();
 
     /**
      * @see OmtpProviderStore#removeProviderInfo(OmtpProviderInfo)
      */
-	public boolean removeProviderInfo(OmtpProviderInfo infos);
+    public boolean removeProviderInfo(OmtpProviderInfo infos);
 
     /**
      * @see OmtpProviderStore#getProviderInfo(String)
      */
-	public OmtpProviderInfo getProviderInfo(String providerName);	
+    public OmtpProviderInfo getProviderInfo(String providerName);
 }
