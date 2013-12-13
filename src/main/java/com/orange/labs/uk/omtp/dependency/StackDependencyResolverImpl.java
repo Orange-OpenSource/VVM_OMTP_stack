@@ -106,6 +106,13 @@ public class StackDependencyResolverImpl implements StackDependencyResolver {
 		return sInstance;
 	}
 
+    /**
+     * Reset the singleton instance, it requires the application context
+     * it may be need when for any reason the application is running with a new application context
+     *
+     * @param appContext New application context
+     * @return {@link StackDependencyResolverImpl} singleton instance
+     */
     public static synchronized  StackDependencyResolverImpl reset(final Context appContext) {
         sInstance = null;
         return StackDependencyResolverImpl.initialize(appContext);
