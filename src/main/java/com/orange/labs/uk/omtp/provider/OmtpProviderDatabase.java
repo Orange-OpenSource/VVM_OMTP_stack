@@ -184,6 +184,8 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 				builder.setFieldsFromProvider(providerInfoCompatible);
 				builder.setIsCurrentProvider(true);
 				providerInfo = builder.build();
+
+                // Set this provider as the current one
 				updateProviderInfo(providerInfo);
 			}
 		}

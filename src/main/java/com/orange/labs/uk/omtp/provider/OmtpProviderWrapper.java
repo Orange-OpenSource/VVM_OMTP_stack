@@ -47,13 +47,19 @@ public interface OmtpProviderWrapper {
 	 * @see OmtpProviderStore#updateProviderInfo(OmtpProviderInfo)
 	 */
 	public boolean updateProviderInfo(OmtpProviderInfo infos);
-	
+
 	/**
 	 * @see OmtpProviderStore#getSupportedProviders()
 	 */
 	public List<OmtpProviderInfo> getSupportedProviders();
-	
+
+    /**
+     * @see OmtpProviderStore#removeProviderInfo(OmtpProviderInfo)
+     */
 	public boolean removeProviderInfo(OmtpProviderInfo infos);
-	
+
+    /**
+     * @see OmtpProviderStore#getProviderInfo(String)
+     */
 	public OmtpProviderInfo getProviderInfo(String providerName);	
 }

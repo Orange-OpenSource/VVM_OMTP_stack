@@ -48,19 +48,31 @@ public interface OmtpProviderStore {
 	 */
 	@Nullable
 	public OmtpProviderInfo getProviderInfoWithNetworkOperator(String networkOperator);
-	
-	// TODO: Doc
+
+    /**
+     * Retrieves the provider set as current for the specified operator
+     * If there is one for the network operator, but set as current, set it as the current one
+     *
+     * @param networkOperator Network operator identifier
+     * @return {@link OmtpProviderInfo}
+     */
 	public OmtpProviderInfo getCurrentProviderInfoWithNetworkOperator(String networkOperator);
 
 	/**
-	 * Retrieves a {@link List} of {@link OmtpProviderInfo} compatible the provided Network Operator, If there is none, returns an empty list
-	 * @param networkOperator Network operator name
+	 * Retrieves a {@link List} of {@link OmtpProviderInfo} compatible the provided Network Operator,
+     * If there is none, returns an empty list
+	 *
+     * @param networkOperator Network operator name
 	 * @return List of providers associated to the operator
 	 */
 	public List<OmtpProviderInfo> getProvidersInfoWithNetworkOperator(String networkOperator);
-	
-	/**
-	 * Removes from the store the {@link OmtpProviderInfo}. A boolean that indicates the success of the operation is returned.
-	 */
+
+    /**
+     * Removes from the store the {@link OmtpProviderInfo}. A boolean that indicates the success
+     * of the operation is returned.
+     *
+     * @param providerInfo {@link OmtpProviderInfo} to be removed
+     * @return True if the provider has been removed
+     */
 	public boolean removeProviderInfo(OmtpProviderInfo providerInfo);
 }
