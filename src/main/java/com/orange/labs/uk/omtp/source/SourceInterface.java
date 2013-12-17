@@ -57,6 +57,7 @@ public interface SourceInterface {
     /**
      * Insert/Update the provided OMTP providers information into the stack.
      * This initial step is needed to provide services to compatible SIMs.
+     * Existing providers are not removed
      *
      * @param providers
      *            an {@link ArrayList} of {@link OmtpProviderInfo} that should
