@@ -46,11 +46,36 @@ public interface SourceInterface {
 	 * 		A {@link List} of {@link OmtpProviderInfo} supported by the current SIM card
 	 */
 	public abstract List<OmtpProviderInfo> getSupportedProviders();
-	
+
+    /**
+     * Insert/Update the provider information in the stack
+     *
+     * @param provider
+     *             a {@link OmtpProviderInfo} that should
+     *            be inserted/updated in the stack.
+     * @return a boolean that indicates if the insertion/update has been done
+     *         successfully.
+     */
 	public abstract boolean updateProvider(OmtpProviderInfo provider);
 
+    /**
+     * Remove the provider information from the stack
+     *
+     * @param provider
+     *             a {@link OmtpProviderInfo} that should
+     *            be removed from the stack.
+     * @return a boolean that indicates if the removal has been done
+     *         successfully.
+     */
 	public abstract boolean removeProvider(OmtpProviderInfo provider);
-	
+
+    /**
+     * Retrieve a Provider available in the stack by its name
+     *
+     * @param providerName Name of the provider as filter
+     * @return The {@link OmtpProviderInfo} found, null if it does not exists
+     */
+    @Nullable
 	public abstract OmtpProviderInfo getProviderWithName(String providerName);
 	
 	/**

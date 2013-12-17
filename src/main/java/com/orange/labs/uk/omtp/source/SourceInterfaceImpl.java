@@ -81,6 +81,7 @@ public class SourceInterfaceImpl implements SourceInterface {
 	}
 	
 	@Override
+    @Nullable
 	public OmtpProviderInfo getProviderWithName(String providerName) {
 		return mDependencyResolver.getProviderStore().getProviderInfo(providerName);
 	}
