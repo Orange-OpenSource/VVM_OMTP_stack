@@ -45,6 +45,38 @@ public class SourceInterfaceImpl implements SourceInterface {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see com.orange.labs.uk.omtp.source.SourceInterface#getCurrentProvider()
+     */
+    @Override
+    @Nullable
+    public OmtpProviderInfo getCurrentProvider() {
+        return mDependencyResolver.getProviderStore().getProviderInfo();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see com.orange.labs.uk.omtp.source.SourceInterface#getProviderWithName(String)
+     */
+    @Override
+    @Nullable
+    public OmtpProviderInfo getProviderWithName(String providerName) {
+        return mDependencyResolver.getProviderStore().getProviderInfo(providerName);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see com.orange.labs.uk.omtp.source.SourceInterface#getSupportedProviders()
+     */
+    @Override
+    public List<OmtpProviderInfo> getSupportedProviders() {
+        return mDependencyResolver.getProviderStore().getSupportedProviders();
+    }
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -64,28 +96,17 @@ public class SourceInterfaceImpl implements SourceInterface {
 	public boolean updateProvider(OmtpProviderInfo provider) {
 		return mDependencyResolver.getProviderStore().updateProviderInfo(provider);
 	}
-	
-	/*
+
+    /*
 	 * (non-Javadoc)
-	 * 
-	 * @see com.orange.labs.uk.omtp.source.SourceInterface#getSupportedProviders()
+	 *
+	 * @see com.orange.labs.uk.omtp.source.SourceInterface#removeProvider(OmtpProviderInfo)
 	 */
-	@Override
-	public List<OmtpProviderInfo> getSupportedProviders() {
-		return mDependencyResolver.getProviderStore().getSupportedProviders();
-	}
-	
 	@Override
 	public boolean removeProvider(OmtpProviderInfo provider) {
 		return mDependencyResolver.getProviderStore().removeProviderInfo(provider);
 	}
-	
-	@Override
-    @Nullable
-	public OmtpProviderInfo getProviderWithName(String providerName) {
-		return mDependencyResolver.getProviderStore().getProviderInfo(providerName);
-	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -107,17 +128,6 @@ public class SourceInterfaceImpl implements SourceInterface {
 		return mDependencyResolver.getAccountStore().getAllAccounts();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.orange.labs.uk.omtp.source.SourceInterface#getCurrentProvider()
-	 */
-	@Override
-	@Nullable
-	public OmtpProviderInfo getCurrentProvider() {
-		return mDependencyResolver.getProviderStore().getProviderInfo();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -17,18 +17,14 @@ import com.orange.labs.uk.omtp.provider.OmtpProviderInfo;
  */
 public interface SourceInterface {
 
-	/**
-	 * Insert/Update the provided OMTP providers information into the stack.
-	 * This initial step is needed to provide services to compatible SIMs.
-	 * 
-	 * @param providers
-	 *            an {@link ArrayList} of {@link OmtpProviderInfo} that should
-	 *            be inserted/updated in the stack.
-	 * 
-	 * @return a boolean that indicates if the insertion has been done
-	 *         successfully.
-	 */
-	public abstract boolean updateProviders(ArrayList<OmtpProviderInfo> providers);
+    /**
+     * Retrieve a Provider available in the stack by its name
+     *
+     * @param providerName Name of the provider as filter
+     * @return The {@link OmtpProviderInfo} found, null if it does not exists
+     */
+    @Nullable
+    public abstract OmtpProviderInfo getProviderWithName(String providerName);
 
 	/**
 	 * This method retrieves the provider associated with the current inserted SIM if one is. It 
@@ -59,6 +55,19 @@ public interface SourceInterface {
 	public abstract boolean updateProvider(OmtpProviderInfo provider);
 
     /**
+     * Insert/Update the provided OMTP providers information into the stack.
+     * This initial step is needed to provide services to compatible SIMs.
+     *
+     * @param providers
+     *            an {@link ArrayList} of {@link OmtpProviderInfo} that should
+     *            be inserted/updated in the stack.
+     *
+     * @return a boolean that indicates if the insertion has been done
+     *         successfully.
+     */
+    public abstract boolean updateProviders(ArrayList<OmtpProviderInfo> providers);
+
+    /**
      * Remove the provider information from the stack
      *
      * @param provider
@@ -68,15 +77,6 @@ public interface SourceInterface {
      *         successfully.
      */
 	public abstract boolean removeProvider(OmtpProviderInfo provider);
-
-    /**
-     * Retrieve a Provider available in the stack by its name
-     *
-     * @param providerName Name of the provider as filter
-     * @return The {@link OmtpProviderInfo} found, null if it does not exists
-     */
-    @Nullable
-	public abstract OmtpProviderInfo getProviderWithName(String providerName);
 	
 	/**
 	 * This method retrieves the account associated to the currently inserted SIM if one exists.
