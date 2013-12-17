@@ -26,15 +26,6 @@ import javax.annotation.Nullable;
 public interface OmtpProviderStore {
 
 	/**
-	 * Update the stored provider information. Insert if necessary. Provider name field needs to be
-	 * filled.
-	 * If the provider is set as the current one, the others corresponding to the same operator will be set as non current
-	 * 
-	 * @param providerInfo	Provider Information
-	 */
-	public boolean updateProviderInfo(OmtpProviderInfo providerInfo);
-	
-	/**
 	 * Gets the provider information based on its name. Returns null if no provider could be found.
 	 * 
 	 * @param	Provider Name
@@ -51,7 +42,7 @@ public interface OmtpProviderStore {
 
     /**
      * Retrieves the provider set as current for the specified operator
-     * If there is one for the network operator, but set as current, set it as the current one
+     * If there is one for the network operator, but not set as current, set it as the current one
      *
      * @param networkOperator Network operator identifier
      * @return {@link OmtpProviderInfo}
@@ -66,6 +57,15 @@ public interface OmtpProviderStore {
 	 * @return List of providers associated to the operator
 	 */
 	public List<OmtpProviderInfo> getProvidersInfoWithNetworkOperator(String networkOperator);
+
+    /**
+     * Update the stored provider information. Insert if necessary. Provider name field needs to be
+     * filled.
+     * If the provider is set as the current one, the others corresponding to the same operator will be set as non current
+     *
+     * @param providerInfo	Provider Information
+     */
+    public boolean updateProviderInfo(OmtpProviderInfo providerInfo);
 
     /**
      * Removes from the store the {@link OmtpProviderInfo}. A boolean that indicates the success

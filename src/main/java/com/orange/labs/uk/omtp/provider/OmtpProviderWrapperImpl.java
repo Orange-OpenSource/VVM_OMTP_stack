@@ -61,6 +61,13 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 		mExecutorService = executorService;
 	}
 
+    /**
+     * Retrieves the Network Operator (MCC/MNC) of the SIM issuer from the {@link TelephonyManager}.
+     */
+    private String getSimOperator() {
+        return mTelephonyManager.getSimOperator();
+    }
+
 	/**
 	 * @see OmtpProviderStore#getProviderInfoWithNetworkOperator(String)
 	 */
@@ -83,13 +90,34 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 		
 		return retrievedProvider;
 	}
-	
-	/**
-	 * Retrieves the Network Operator (MCC/MNC) of the SIM issuer from the {@link TelephonyManager}.
-	 */
-	private String getSimOperator() {
-		return mTelephonyManager.getSimOperator();
-	}
+
+    @Override
+    @Nullable
+    public OmtpProviderInfo getProviderInfo(String providerName) {
+        OmtpProviderInfo retrievedProvider = mProviderStore.getProviderInfo(providerName);
+        return retrievedProvider;
+    }
+
+    /**
+     * Returns a list of OMTP providers supported by the SIM
+     */
+    public List<OmtpProviderInfo> getSupportedProviders() {
+        String networkOperator = getSimOperator();
+        List<OmtpProviderInfo> listSupportedProviders = new ArrayList<OmtpProviderInfo>();
+
+        // please note that:
+        // in some situations e.g. if device is in Airplane mode, the getSimOperator()
+        // method will return null because SIM may not be in SIM_STATE_READY,
+        // which is the case for example on Nexus S running Android 4.1.2,
+        if ((networkOperator == null || networkOperator.length() == 0)) {
+            logger.w("For some reason SIM operator has not been retrieved while trying to get" +
+                    "providerInfo information");
+        } else {
+            listSupportedProviders = mProviderStore.getProvidersInfoWithNetworkOperator(networkOperator);
+        }
+
+        return listSupportedProviders;
+    }
 
 	/**
 	 * @see OmtpProviderWrapper#updateProvidersInfo(ArrayList)
@@ -144,28 +172,7 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 		}
 		return false;
 	}
-	
-	/**
-	 * Returns a list of OMTP providers supported by the SIM
-	 */
-	public List<OmtpProviderInfo> getSupportedProviders() {
-		String networkOperator = getSimOperator();
-		List<OmtpProviderInfo> listSupportedProviders = new ArrayList<OmtpProviderInfo>();
-		
-		// please note that:
-		// in some situations e.g. if device is in Airplane mode, the getSimOperator()
-		// method will return null because SIM may not be in SIM_STATE_READY,
-		// which is the case for example on Nexus S running Android 4.1.2,
-		if ((networkOperator == null || networkOperator.length() == 0)) {
-			logger.w("For some reason SIM operator has not been retrieved while trying to get" +
-					"providerInfo information");
-		} else {
-			listSupportedProviders = mProviderStore.getProvidersInfoWithNetworkOperator(networkOperator);
-		}
-		
-		return listSupportedProviders;
-	}
-	
+
 	public boolean removeProviderInfo(OmtpProviderInfo infos) {
 		return removeProviderInfoOnThreadPool(infos);
 	}
@@ -178,7 +185,7 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 				return mProviderStore.removeProviderInfo(infos);
 			}
 		});
-				
+
 		try {
 			return future.get();
 		} catch (InterruptedException e) {
@@ -193,11 +200,4 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 		}
 		return false;
 	}
-
-	@Override
-	public OmtpProviderInfo getProviderInfo(String providerName) {
-		OmtpProviderInfo retrievedProvider = mProviderStore.getProviderInfo(providerName);
-		return retrievedProvider;
-	}
-	
 }

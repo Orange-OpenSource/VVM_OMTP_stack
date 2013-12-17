@@ -46,111 +46,7 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 	public OmtpProviderDatabase(DatabaseHelper dbHelper) {
 		mDatabaseHelper = dbHelper;
 	}
-	
 
-	@Override
-	public synchronized boolean updateProviderInfo(final OmtpProviderInfo providerInfo) {
-		
-		// check if providers table exists and create it if not before inserting 
-		// any data to it
-		mDatabaseHelper.checkIfTableExists(PROVIDERS_TABLE_NAME);
-
-		logger.d(String.format("Inserting/Updating provider information named: %s",
-				providerInfo.getProviderName()));
-
-		// Get Db access
-		SQLiteDatabase database = null;
-		try {
-			database = mDatabaseHelper.getWritableDatabase();
-		} catch (SQLiteException e) {
-			logger.e(String.format("Impossible to get a writable database: %s",
-					e.getLocalizedMessage()));
-			return false;
-		}
-		
-		ContentValues values = getContentValues(providerInfo);
-		
-
-		boolean updatedOrInserted = false;
-		String providerName = providerInfo.getProviderName();
-		OmtpProviderInfo providerInfoFromDb = getProviderInfo(providerName);
-		if(providerInfoFromDb == null) {
-			// Insert it
-			updatedOrInserted = database.replace(PROVIDERS_TABLE_NAME, null, values) != -1;
-		}
-		else {
-			// Update the record
-			String query = getEqualityClause(OmtpProviderColumns.PROVIDER_NAME, providerName);
-			updatedOrInserted = (database.update(PROVIDERS_TABLE_NAME, values, query, null) > 0);
-		}
-		
-		// Set the others providers as non current if this one is set as current 
-		boolean otherProvidersUpdated = true;
-		if(updatedOrInserted) {
-			if(providerInfo.isCurrentProvider()) {
-				// Get all the other providers from the db corresponding to the same operator
-				List<OmtpProviderInfo> providersForSameOperator = getProvidersInfoWithNetworkOperator(providerInfo.getNetworkOperator());
-				
-				if(! providersForSameOperator.isEmpty()) {
-					for (OmtpProviderInfo omtpProviderForSameOperator : providersForSameOperator) {
-						// If it's not the provider set as current one and it is set as a current one
-						if(! providerInfo.getProviderName().equals(omtpProviderForSameOperator.getProviderName())
-								&& omtpProviderForSameOperator.isCurrentProvider()) {
-							
-							logger.d(String.format("Making omtp provider non current, %s", omtpProviderForSameOperator));
-							boolean providerReplaced = replaceProviderInfoAndSetAsNonCurrent(omtpProviderForSameOperator, database);
-							otherProvidersUpdated = otherProvidersUpdated && providerReplaced;
-						}
-					}
-				}
-			}
-		}
-		
-		return updatedOrInserted && otherProvidersUpdated;
-	}
-	
-	private boolean replaceProviderInfoAndSetAsNonCurrent(OmtpProviderInfo providerInfo, SQLiteDatabase database) {
-		return replaceProviderInfoAndSetIsCurrentProviderValue(providerInfo, database, false);
-	}
-	
-	private boolean replaceProviderInfoAndSetIsCurrentProviderValue(OmtpProviderInfo providerInfo, SQLiteDatabase database, boolean isCurrentProvider) {
-		ContentValues values = getContentValues(providerInfo);
-		if(values.containsKey(OmtpProviderColumns.IS_CURRENT_PROVIDER.getColumnName())) {
-			values.put(OmtpProviderColumns.IS_CURRENT_PROVIDER.getColumnName(), isCurrentProvider);
-		}
-		
-		// Update the record
-		String query = getEqualityClause(OmtpProviderColumns.PROVIDER_NAME, values.getAsString(OmtpProviderColumns.PROVIDER_NAME.getColumnName()));
-		boolean updated = (database.update(PROVIDERS_TABLE_NAME, values, query, null) > 0);
-
-		return updated;
-	}
-	
-	
-	@Override
-	public synchronized boolean removeProviderInfo(OmtpProviderInfo providerInfo) {
-		
-		if(providerInfo == null) {
-			logger.d("Cannot continue removing provider as it is null");
-			return false;
-		}
-		
-		logger.d(String.format("Removing provider information named: %s", providerInfo.getProviderName()));
-
-		SQLiteDatabase database = null;
-		try {
-			database = mDatabaseHelper.getWritableDatabase();
-		} catch (SQLiteException e) {
-			logger.e(String.format("Impossible to get a writable database: %s",
-					e.getLocalizedMessage()));
-			return false;
-		}
-		
-		String query = getEqualityClause(OmtpProviderColumns.PROVIDER_NAME, providerInfo.getProviderName());
-		
-		return (database.delete(PROVIDERS_TABLE_NAME, query, null) > 0);
-	}
-	
 	@Override
 	@Nullable
 	public synchronized OmtpProviderInfo getProviderInfo(String providerName) {
@@ -288,24 +184,6 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 	}
 	
 	/**
-	 * Get an OMTP readable database
-	 * 
-	 * @return OMTP stack readable database, null if it can't be opened
-	 */
-	@Nullable
-	private SQLiteDatabase getReadableDatabase() {
-		SQLiteDatabase database = null;
-		try {
-			database = mDatabaseHelper.getReadableDatabase();
-		} catch (SQLiteException e) {
-			logger.e(String.format("Impossible to open the OMTP Stack database: %s",
-					e.getLocalizedMessage()));
-			return null;
-		}
-		return database;
-	}
-	
-	/**
 	 * Retrieve from the database the record corresponding to the column/value combination
 	 * <p>
 	 * Build a {@link OmtpProviderInfo} instance from the record retrieved from the database and
@@ -396,6 +274,109 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 		}
 	}
 
+
+    @Override
+    public synchronized boolean updateProviderInfo(final OmtpProviderInfo providerInfo) {
+
+        // check if providers table exists and create it if not before inserting
+        // any data to it
+        mDatabaseHelper.checkIfTableExists(PROVIDERS_TABLE_NAME);
+
+        logger.d(String.format("Inserting/Updating provider information named: %s",
+                providerInfo.getProviderName()));
+
+        // Get Db access
+        SQLiteDatabase database = null;
+        try {
+            database = mDatabaseHelper.getWritableDatabase();
+        } catch (SQLiteException e) {
+            logger.e(String.format("Impossible to get a writable database: %s",
+                    e.getLocalizedMessage()));
+            return false;
+        }
+
+        ContentValues values = getContentValues(providerInfo);
+
+
+        boolean updatedOrInserted = false;
+        String providerName = providerInfo.getProviderName();
+        OmtpProviderInfo providerInfoFromDb = getProviderInfo(providerName);
+        if(providerInfoFromDb == null) {
+            // Insert it
+            updatedOrInserted = database.replace(PROVIDERS_TABLE_NAME, null, values) != -1;
+        }
+        else {
+            // Update the record
+            String query = getEqualityClause(OmtpProviderColumns.PROVIDER_NAME, providerName);
+            updatedOrInserted = (database.update(PROVIDERS_TABLE_NAME, values, query, null) > 0);
+        }
+
+        // Set the others providers as non current if this one is set as current
+        boolean otherProvidersUpdated = true;
+        if(updatedOrInserted) {
+            if(providerInfo.isCurrentProvider()) {
+                // Get all the other providers from the db corresponding to the same operator
+                List<OmtpProviderInfo> providersForSameOperator = getProvidersInfoWithNetworkOperator(providerInfo.getNetworkOperator());
+
+                if(! providersForSameOperator.isEmpty()) {
+                    for (OmtpProviderInfo omtpProviderForSameOperator : providersForSameOperator) {
+                        // If it's not the provider set as current one and it is set as a current one
+                        if(! providerInfo.getProviderName().equals(omtpProviderForSameOperator.getProviderName())
+                                && omtpProviderForSameOperator.isCurrentProvider()) {
+
+                            logger.d(String.format("Making omtp provider non current, %s", omtpProviderForSameOperator));
+                            boolean providerReplaced = replaceProviderInfoAndSetAsNonCurrent(omtpProviderForSameOperator, database);
+                            otherProvidersUpdated = otherProvidersUpdated && providerReplaced;
+                        }
+                    }
+                }
+            }
+        }
+
+        return updatedOrInserted && otherProvidersUpdated;
+    }
+
+    private boolean replaceProviderInfoAndSetAsNonCurrent(OmtpProviderInfo providerInfo, SQLiteDatabase database) {
+        return replaceProviderInfoAndSetIsCurrentProviderValue(providerInfo, database, false);
+    }
+
+    private boolean replaceProviderInfoAndSetIsCurrentProviderValue(OmtpProviderInfo providerInfo, SQLiteDatabase database, boolean isCurrentProvider) {
+        ContentValues values = getContentValues(providerInfo);
+        if(values.containsKey(OmtpProviderColumns.IS_CURRENT_PROVIDER.getColumnName())) {
+            values.put(OmtpProviderColumns.IS_CURRENT_PROVIDER.getColumnName(), isCurrentProvider);
+        }
+
+        // Update the record
+        String query = getEqualityClause(OmtpProviderColumns.PROVIDER_NAME, values.getAsString(OmtpProviderColumns.PROVIDER_NAME.getColumnName()));
+        boolean updated = (database.update(PROVIDERS_TABLE_NAME, values, query, null) > 0);
+
+        return updated;
+    }
+
+    @Override
+    public synchronized boolean removeProviderInfo(OmtpProviderInfo providerInfo) {
+
+        if(providerInfo == null) {
+            logger.d("Cannot continue removing provider as it is null");
+            return false;
+        }
+
+        logger.d(String.format("Removing provider information named: %s", providerInfo.getProviderName()));
+
+        SQLiteDatabase database = null;
+        try {
+            database = mDatabaseHelper.getWritableDatabase();
+        } catch (SQLiteException e) {
+            logger.e(String.format("Impossible to get a writable database: %s",
+                    e.getLocalizedMessage()));
+            return false;
+        }
+
+        String query = getEqualityClause(OmtpProviderColumns.PROVIDER_NAME, providerInfo.getProviderName());
+
+        return (database.delete(PROVIDERS_TABLE_NAME, query, null) > 0);
+    }
+
 	/**
 	 * Generate a {@link ContentValues} object from the provided {@link OmtpProviderInfo}.
 	 */
@@ -435,7 +416,25 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 		clause.append(")");
 		return clause.toString();
 	}
-	
+
+    /**
+     * Get an OMTP readable database
+     *
+     * @return OMTP stack readable database, null if it can't be opened
+     */
+    @Nullable
+    private SQLiteDatabase getReadableDatabase() {
+        SQLiteDatabase database = null;
+        try {
+            database = mDatabaseHelper.getReadableDatabase();
+        } catch (SQLiteException e) {
+            logger.e(String.format("Impossible to open the OMTP Stack database: %s",
+                    e.getLocalizedMessage()));
+            return null;
+        }
+        return database;
+    }
+
 	public boolean deleteTableContent() {
 		// Get Db access
 		SQLiteDatabase database = null;

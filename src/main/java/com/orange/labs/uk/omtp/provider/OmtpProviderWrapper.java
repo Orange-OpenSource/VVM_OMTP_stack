@@ -33,6 +33,17 @@ public interface OmtpProviderWrapper {
     public OmtpProviderInfo getProviderInfo();
 
     /**
+     * @see OmtpProviderStore#getProviderInfo(String)
+     */
+    @Nullable
+    public OmtpProviderInfo getProviderInfo(String providerName);
+
+    /**
+     * @see OmtpProviderStore#getSupportedProviders()
+     */
+    public List<OmtpProviderInfo> getSupportedProviders();
+
+    /**
      * Insert in the storage the provided list of {@link OmtpProviderInfo}.
      * @return
      *
@@ -49,17 +60,8 @@ public interface OmtpProviderWrapper {
     public boolean updateProviderInfo(OmtpProviderInfo infos);
 
     /**
-     * @see OmtpProviderStore#getSupportedProviders()
-     */
-    public List<OmtpProviderInfo> getSupportedProviders();
-
-    /**
      * @see OmtpProviderStore#removeProviderInfo(OmtpProviderInfo)
      */
     public boolean removeProviderInfo(OmtpProviderInfo infos);
 
-    /**
-     * @see OmtpProviderStore#getProviderInfo(String)
-     */
-    public OmtpProviderInfo getProviderInfo(String providerName);
 }
