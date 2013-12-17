@@ -39,7 +39,7 @@ public interface OmtpProviderWrapper {
     public OmtpProviderInfo getProviderInfo(String providerName);
 
     /**
-     * @see OmtpProviderStore#getSupportedProviders()
+     * Returns a list of OMTP providers supported by the SIM
      */
     public List<OmtpProviderInfo> getSupportedProviders();
 
