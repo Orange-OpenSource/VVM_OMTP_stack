@@ -27,6 +27,7 @@ public enum OmtpProviderColumns implements DatabaseColumn {
 	CLIENT_TYPE("client_type", "TEXT", 1),
 	SMS_DESTINATION_NUMBER("sms_destination", "TEXT", 1),
 	SMS_DESTINATION_PORT("sms_port", "INTEGER", 1),
+    SMS_SERVICE_CENTER("sms_service_center", "TEXT", 4),
 	DATE_FORMAT("date_format", "TEXT", 1),
 	IS_CURRENT_PROVIDER("is_current_provider", "INTEGER", 3);
 	
