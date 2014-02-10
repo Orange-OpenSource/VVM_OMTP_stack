@@ -48,7 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static Logger logger = Logger.getLogger(DatabaseHelper.class);
 	
     private static final String DB_NAME = "omtpstack.db";
-    public static final int DB_VERSION = 3;
+    public static final int DB_VERSION = 4;
     private static final HashMap<String, DatabaseColumn[]> DB_COLUMNS = 
     		new HashMap<String, DatabaseColumn[]>();
     		
