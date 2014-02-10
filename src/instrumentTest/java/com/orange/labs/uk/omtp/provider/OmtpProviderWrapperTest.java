@@ -1,13 +1,13 @@
 package com.orange.labs.uk.omtp.provider;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.test.AndroidTestCase;
 
 import com.orange.labs.uk.omtp.dependency.StackDependencyResolver;
 import com.orange.labs.uk.omtp.dependency.StackDependencyResolverImpl;
 import com.orange.labs.uk.omtp.protocol.Omtp;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class OmtpProviderWrapperTest extends AndroidTestCase {
@@ -16,7 +16,8 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 	private static final String CLIENT_TYPE = "TestClient";
 	private static final String SMS_DESTINATION_NUMBER = "0123456789";
 	private static final short SMS_DESTINATION_PORT = 123;
-	private static final String DATE_FORMAT = "TestDateFormat";
+    private static final String SMS_SERVICE_CENTER = "+4443703750";
+    private static final String DATE_FORMAT = "TestDateFormat";
 	private static final String NETWORK_OPERATOR = "20801"; // Orange
 	private static final boolean IS_CURRENT_PROVIDER = false;
 	
@@ -25,7 +26,8 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 	private static final String CLIENT_TYPE2 = "TestClient2";
 	private static final String SMS_DESTINATION_NUMBER2 = "01234567892";
 	private static final short SMS_DESTINATION_PORT2 = 124;
-	private static final String DATE_FORMAT2 = "TestDateFormat2";
+    private static final String SMS_SERVICE_CENTER2 = null;
+    private static final String DATE_FORMAT2 = "TestDateFormat2";
 	private static final String NETWORK_OPERATOR2 = "20801"; // Orange
 	private static final boolean IS_CURRENT_PROVIDER2 = false;
 	
@@ -41,6 +43,7 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 				.setClientType(CLIENT_TYPE)
 				.setSmsDestinationNumber(SMS_DESTINATION_NUMBER)
 				.setSmsDestinationPort(SMS_DESTINATION_PORT)
+                .setSmsServiceCenter(SMS_SERVICE_CENTER)
 				.setNetworkOperator(NETWORK_OPERATOR)
 				.setDateFormat(DATE_FORMAT)
 				.setIsCurrentProvider(IS_CURRENT_PROVIDER).build();
@@ -54,7 +57,8 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 				.setClientType(CLIENT_TYPE2)
 				.setSmsDestinationNumber(SMS_DESTINATION_NUMBER2)
 				.setSmsDestinationPort(SMS_DESTINATION_PORT2)
-				.setNetworkOperator(NETWORK_OPERATOR)
+                .setSmsServiceCenter(SMS_SERVICE_CENTER2)
+                .setNetworkOperator(NETWORK_OPERATOR)
 				.setDateFormat(DATE_FORMAT2)
 				.setIsCurrentProvider(IS_CURRENT_PROVIDER2).build();
 		return providerInfo;
@@ -109,6 +113,7 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 		assertEquals(CLIENT_TYPE, currentProviderInfo.getClientType());
 		assertEquals(SMS_DESTINATION_NUMBER, currentProviderInfo.getSmsDestinationNumber());
 		assertEquals(SMS_DESTINATION_PORT, currentProviderInfo.getSmsDestinationPort());
+        assertEquals(SMS_SERVICE_CENTER, currentProviderInfo.getSmsServiceCenter());
 		assertEquals(NETWORK_OPERATOR, currentProviderInfo.getNetworkOperator());
 		assertEquals(DATE_FORMAT, currentProviderInfo.getDateFormat());
 		// Should now be set as current
@@ -133,7 +138,8 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 		assertEquals(CLIENT_TYPE, providerInfo.getClientType());
 		assertEquals(SMS_DESTINATION_NUMBER, providerInfo.getSmsDestinationNumber());
 		assertEquals(SMS_DESTINATION_PORT, providerInfo.getSmsDestinationPort());
-		assertEquals(NETWORK_OPERATOR, providerInfo.getNetworkOperator());
+        assertEquals(SMS_SERVICE_CENTER, providerInfo.getSmsServiceCenter());
+        assertEquals(NETWORK_OPERATOR, providerInfo.getNetworkOperator());
 		assertEquals(DATE_FORMAT, providerInfo.getDateFormat());
 		assertEquals(IS_CURRENT_PROVIDER, providerInfo.isCurrentProvider());
 		
@@ -167,7 +173,8 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 		assertEquals(providerInfo.getClientType(), providerInfoInserted.getClientType());
 		assertEquals(providerInfo.getSmsDestinationNumber(), providerInfoInserted.getSmsDestinationNumber());
 		assertEquals(providerInfo.getSmsDestinationPort(), providerInfoInserted.getSmsDestinationPort());
-		assertEquals(providerInfo.getNetworkOperator(), providerInfoInserted.getNetworkOperator());
+        assertEquals(providerInfo.getSmsServiceCenter(), providerInfoInserted.getSmsServiceCenter());
+        assertEquals(providerInfo.getNetworkOperator(), providerInfoInserted.getNetworkOperator());
 		assertEquals(providerInfo.getDateFormat(), providerInfoInserted.getDateFormat());
 		assertEquals(providerInfo.isCurrentProvider(), providerInfoInserted.isCurrentProvider());
 		
@@ -182,7 +189,8 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 		assertEquals(secondProviderInfo.getClientType(), secondProviderInfoInserted.getClientType());
 		assertEquals(secondProviderInfo.getSmsDestinationNumber(), secondProviderInfoInserted.getSmsDestinationNumber());
 		assertEquals(secondProviderInfo.getSmsDestinationPort(), secondProviderInfoInserted.getSmsDestinationPort());
-		assertEquals(secondProviderInfo.getNetworkOperator(), secondProviderInfoInserted.getNetworkOperator());
+        assertEquals(secondProviderInfo.getSmsServiceCenter(), secondProviderInfoInserted.getSmsServiceCenter());
+        assertEquals(secondProviderInfo.getNetworkOperator(), secondProviderInfoInserted.getNetworkOperator());
 		assertEquals(secondProviderInfo.getDateFormat(), secondProviderInfoInserted.getDateFormat());
 		assertEquals(secondProviderInfo.isCurrentProvider(), secondProviderInfoInserted.isCurrentProvider());
 		
@@ -193,7 +201,8 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 		builder.setClientType(CLIENT_TYPE);
 		builder.setSmsDestinationNumber(SMS_DESTINATION_NUMBER);
 		builder.setSmsDestinationPort(SMS_DESTINATION_PORT);
-		builder.setNetworkOperator(NETWORK_OPERATOR);
+        builder.setSmsServiceCenter(SMS_SERVICE_CENTER);
+        builder.setNetworkOperator(NETWORK_OPERATOR);
 		builder.setDateFormat(DATE_FORMAT);
 		builder.setIsCurrentProvider(IS_CURRENT_PROVIDER);
 		OmtpProviderInfo providerUpdated = builder.build();
@@ -207,7 +216,8 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 		assertEquals(providerUpdated.getClientType(), providerUpdatedInDb.getClientType());
 		assertEquals(providerUpdated.getSmsDestinationNumber(), providerUpdatedInDb.getSmsDestinationNumber());
 		assertEquals(providerUpdated.getSmsDestinationPort(), providerUpdatedInDb.getSmsDestinationPort());
-		assertEquals(providerUpdated.getNetworkOperator(), providerUpdatedInDb.getNetworkOperator());
+        assertEquals(providerUpdated.getSmsServiceCenter(), providerUpdatedInDb.getSmsServiceCenter());
+        assertEquals(providerUpdated.getNetworkOperator(), providerUpdatedInDb.getNetworkOperator());
 		assertEquals(providerUpdated.getDateFormat(), providerUpdatedInDb.getDateFormat());
 		assertEquals(providerUpdated.isCurrentProvider(), providerUpdatedInDb.isCurrentProvider());
 		
