@@ -15,11 +15,6 @@
  */
 package com.orange.labs.uk.omtp.provider;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import android.content.ContentValues;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
@@ -30,6 +25,11 @@ import android.database.sqlite.SQLiteException;
 import com.orange.labs.uk.omtp.db.DatabaseHelper;
 import com.orange.labs.uk.omtp.logging.Logger;
 import com.orange.labs.uk.omtp.utils.CloseUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  *	Utility class that allows the manipulation of the {@link ProviderInfo} stored in the stack
@@ -414,6 +414,14 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 				providerInfo.getSmsDestinationNumber());
 		contentValues.put(OmtpProviderColumns.SMS_DESTINATION_PORT.getColumnName(),
 				providerInfo.getSmsDestinationPort());
+        // The short service center number may be null
+        if(providerInfo.getSmsServiceCenter() == null) {
+            contentValues.putNull(OmtpProviderColumns.SMS_SERVICE_CENTER.getColumnName());
+        }
+        else {
+            contentValues.put(OmtpProviderColumns.SMS_SERVICE_CENTER.getColumnName(),
+                    providerInfo.getSmsServiceCenter());
+        }
 		contentValues.put(OmtpProviderColumns.IS_CURRENT_PROVIDER.getColumnName(),
 				providerInfo.isCurrentProvider());
 		return contentValues;
