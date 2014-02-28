@@ -1,10 +1,11 @@
 package com.orange.labs.uk.omtp.provider;
 
-import junit.framework.TestCase;
 import android.os.Bundle;
 import android.os.Parcel;
 
 import com.orange.labs.uk.omtp.protocol.Omtp;
+
+import junit.framework.TestCase;
 
 public class OmtpProviderInfoTest extends TestCase {
 
@@ -13,7 +14,8 @@ public class OmtpProviderInfoTest extends TestCase {
 	private static final String CLIENT_TYPE = "TestClient";
 	private static final String SMS_DESTINATION_NUMBER = "0123456789";
 	private static final short SMS_DESTINATION_PORT = 123;
-	private static final String DATE_FORMAT = "TestDateFormat";
+    private static final String SMS_SERVICE_CENTER = "+449604303495";
+    private static final String DATE_FORMAT = "TestDateFormat";
 	private static final String NETWORK_OPERATOR = "NetworkOperator";
 	private static final boolean IS_CURRENT_PROVIDER = true;
 
@@ -24,6 +26,7 @@ public class OmtpProviderInfoTest extends TestCase {
 				.setClientType(CLIENT_TYPE)
 				.setSmsDestinationNumber(SMS_DESTINATION_NUMBER)
 				.setSmsDestinationPort(SMS_DESTINATION_PORT)
+                .setSmsServiceCenter(SMS_SERVICE_CENTER)
 				.setDateFormat(DATE_FORMAT)
 				.setNetworkOperator(NETWORK_OPERATOR)
 				.setIsCurrentProvider(IS_CURRENT_PROVIDER);
@@ -36,7 +39,8 @@ public class OmtpProviderInfoTest extends TestCase {
 		assertEquals(CLIENT_TYPE, providerInfo.getClientType());
 		assertEquals(SMS_DESTINATION_NUMBER, providerInfo.getSmsDestinationNumber());
 		assertEquals(SMS_DESTINATION_PORT, providerInfo.getSmsDestinationPort());
-		assertEquals(DATE_FORMAT, providerInfo.getDateFormat());
+        assertEquals(SMS_SERVICE_CENTER, providerInfo.getSmsServiceCenter());
+        assertEquals(DATE_FORMAT, providerInfo.getDateFormat());
 		assertEquals(NETWORK_OPERATOR, providerInfo.getNetworkOperator());
 		assertEquals(IS_CURRENT_PROVIDER, providerInfo.isCurrentProvider());
 	}
@@ -78,7 +82,16 @@ public class OmtpProviderInfoTest extends TestCase {
 		
 		assertNull(providerInfo);
 	}
-	
+
+    // Test creation with sms service center null value
+    public void testProviderInfoCreationWithSmsServiceCenterNull() {
+        OmtpProviderInfo.Builder builder = getProviderInfoBuilderWithValidValues();
+        OmtpProviderInfo providerInfo = builder.setSmsServiceCenter(null).build();
+
+        // Accept null value
+        assertNotNull(providerInfo);
+    }
+
 	// Test creation with date format null value
 	public void testProviderInfoCreationWithDateFormatNull() {
 		OmtpProviderInfo.Builder builder = getProviderInfoBuilderWithValidValues();
@@ -127,15 +140,52 @@ public class OmtpProviderInfoTest extends TestCase {
 	    Bundle bundleDestination = parcel.readBundle();
 	    bundleDestination.setClassLoader(OmtpProviderInfo.class.getClassLoader());
 	    OmtpProviderInfo providerInfoCreatedFromParcel = bundleDestination.getParcelable(KEY_BUNDLE);
-		
-		assertEquals(providerInfo.getProviderName(), providerInfoCreatedFromParcel.getProviderName());
+
+        assertNotNull(providerInfoCreatedFromParcel);
+
+        assertEquals(providerInfo.getProviderName(), providerInfoCreatedFromParcel.getProviderName());
 		assertEquals(providerInfo.getProtocolVersion(), providerInfoCreatedFromParcel.getProtocolVersion());
 		assertEquals(providerInfo.getClientType(), providerInfoCreatedFromParcel.getClientType());
 		assertEquals(providerInfo.getSmsDestinationNumber(), providerInfoCreatedFromParcel.getSmsDestinationNumber());
 		assertEquals(providerInfo.getSmsDestinationPort(), providerInfoCreatedFromParcel.getSmsDestinationPort());
-		assertEquals(providerInfo.getDateFormat(), providerInfoCreatedFromParcel.getDateFormat());
+        assertEquals(providerInfo.getSmsServiceCenter(), providerInfoCreatedFromParcel.getSmsServiceCenter());
+        assertEquals(providerInfo.getDateFormat(), providerInfoCreatedFromParcel.getDateFormat());
 		assertEquals(providerInfo.getNetworkOperator(), providerInfoCreatedFromParcel.getNetworkOperator());
 		assertEquals(providerInfo.isCurrentProvider(), providerInfoCreatedFromParcel.isCurrentProvider());
 		
 	}
+
+    // Test parcel
+    public void testParcelCreationWithSmscNull() {
+        OmtpProviderInfo.Builder builder = getProviderInfoBuilderWithValidValues();
+        OmtpProviderInfo providerInfo = builder.setSmsServiceCenter(null).build();
+
+        Bundle bundle = new Bundle();
+        final String KEY_BUNDLE = "KEY_BUNDLE";
+        bundle.putParcelable(KEY_BUNDLE, providerInfo);
+
+        //Save bundle to parcel
+        Parcel parcel = Parcel.obtain();
+        bundle.writeToParcel(parcel, 0);
+
+        //Extract bundle from parcel
+        parcel.setDataPosition(0);
+        Bundle bundleDestination = parcel.readBundle();
+        bundleDestination.setClassLoader(OmtpProviderInfo.class.getClassLoader());
+        OmtpProviderInfo providerInfoCreatedFromParcel = bundleDestination.getParcelable(KEY_BUNDLE);
+
+        assertNotNull(providerInfoCreatedFromParcel);
+
+        assertEquals(providerInfo.getProviderName(), providerInfoCreatedFromParcel.getProviderName());
+        assertEquals(providerInfo.getProtocolVersion(), providerInfoCreatedFromParcel.getProtocolVersion());
+        assertEquals(providerInfo.getClientType(), providerInfoCreatedFromParcel.getClientType());
+        assertEquals(providerInfo.getSmsDestinationNumber(), providerInfoCreatedFromParcel.getSmsDestinationNumber());
+        assertEquals(providerInfo.getSmsDestinationPort(), providerInfoCreatedFromParcel.getSmsDestinationPort());
+        assertEquals(providerInfo.getSmsServiceCenter(), providerInfoCreatedFromParcel.getSmsServiceCenter());
+        assertNull(providerInfoCreatedFromParcel.getSmsServiceCenter());
+        assertEquals(providerInfo.getDateFormat(), providerInfoCreatedFromParcel.getDateFormat());
+        assertEquals(providerInfo.getNetworkOperator(), providerInfoCreatedFromParcel.getNetworkOperator());
+        assertEquals(providerInfo.isCurrentProvider(), providerInfoCreatedFromParcel.isCurrentProvider());
+
+    }
 }

@@ -1,11 +1,12 @@
 package com.orange.labs.uk.omtp.provider;
 
-import java.util.List;
-
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.orange.labs.uk.omtp.dependency.StackDependencyResolverImpl;
 import com.orange.labs.uk.omtp.protocol.Omtp;
+
+import java.util.List;
 
 public class OmtpProviderDatabaseTest extends AndroidTestCase {
 
@@ -14,7 +15,8 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 	private static final String CLIENT_TYPE = "TestClient";
 	private static final String SMS_DESTINATION_NUMBER = "0123456789";
 	private static final short SMS_DESTINATION_PORT = 123;
-	private static final String DATE_FORMAT = "TestDateFormat";
+    private static final String SMS_SERVICE_CENTER = "+4405948020";
+    private static final String DATE_FORMAT = "TestDateFormat";
 	private static final String NETWORK_OPERATOR = "NetworkOperator";
 	private static final boolean IS_CURRENT_PROVIDER = true;
 	
@@ -23,7 +25,8 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 	private static final String CLIENT_TYPE2 = "TestClient2";
 	private static final String SMS_DESTINATION_NUMBER2 = "01234567892";
 	private static final short SMS_DESTINATION_PORT2 = 124;
-	private static final String DATE_FORMAT2 = "TestDateFormat2";
+    private static final String SMS_SERVICE_CENTER2 = null;
+    private static final String DATE_FORMAT2 = "TestDateFormat2";
 	private static final String NETWORK_OPERATOR2 = "NetworkOperator2";
 	private static final boolean IS_CURRENT_PROVIDER2 = true;
 
@@ -39,9 +42,11 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 			mProviderDb = new OmtpProviderDatabase(
 					StackDependencyResolverImpl.getInstance()
 					.getProviderDatabaseHelper());
-			
-			mProviderDb.deleteTableContent();
-			NUMBER_OF_PROVIDERS_INSERTED = 0;
+
+            Log.d("OmtpProviderDatabaseTest", "deleteTableContent Provider");
+            mProviderDb.deleteTableContent();
+
+            NUMBER_OF_PROVIDERS_INSERTED = 0;
 		} catch (IllegalStateException ise) {
 			// do nothing
 		}
@@ -54,6 +59,7 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 				.setClientType(CLIENT_TYPE)
 				.setSmsDestinationNumber(SMS_DESTINATION_NUMBER)
 				.setSmsDestinationPort(SMS_DESTINATION_PORT)
+                .setSmsServiceCenter(SMS_SERVICE_CENTER)
 				.setNetworkOperator(NETWORK_OPERATOR)
 				.setDateFormat(DATE_FORMAT)
 				.setIsCurrentProvider(IS_CURRENT_PROVIDER).build();
@@ -67,6 +73,7 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 				.setClientType(CLIENT_TYPE2)
 				.setSmsDestinationNumber(SMS_DESTINATION_NUMBER2)
 				.setSmsDestinationPort(SMS_DESTINATION_PORT2)
+                .setSmsServiceCenter(SMS_SERVICE_CENTER2)
 				.setNetworkOperator(NETWORK_OPERATOR2)
 				.setDateFormat(DATE_FORMAT2)
 				.setIsCurrentProvider(IS_CURRENT_PROVIDER2).build();
@@ -88,8 +95,9 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		assertEquals(PROTOCOL_VERSION, providerInfoRetrieved.getProtocolVersion());
 		assertEquals(CLIENT_TYPE, providerInfoRetrieved.getClientType());
 		assertEquals(SMS_DESTINATION_NUMBER, providerInfoRetrieved.getSmsDestinationNumber());
-		assertEquals(SMS_DESTINATION_PORT, providerInfoRetrieved.getSmsDestinationPort());
-		assertEquals(NETWORK_OPERATOR, providerInfoRetrieved.getNetworkOperator());
+		assertEquals(SMS_SERVICE_CENTER, providerInfoRetrieved.getSmsServiceCenter());
+        assertEquals(SMS_DESTINATION_PORT, providerInfoRetrieved.getSmsDestinationPort());
+        assertEquals(NETWORK_OPERATOR, providerInfoRetrieved.getNetworkOperator());
 		assertEquals(DATE_FORMAT, providerInfoRetrieved.getDateFormat());
 		assertEquals(IS_CURRENT_PROVIDER, providerInfoRetrieved.isCurrentProvider());
 		
@@ -110,6 +118,7 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 												.setClientType(CLIENT_TYPE2)
 												.setSmsDestinationNumber(SMS_DESTINATION_NUMBER2)
 												.setSmsDestinationPort(SMS_DESTINATION_PORT2)
+                                                .setSmsServiceCenter(SMS_SERVICE_CENTER2)
 												.setNetworkOperator(NETWORK_OPERATOR2)
 												.setDateFormat(DATE_FORMAT2)
 												.setIsCurrentProvider(IS_CURRENT_PROVIDER2).build();
@@ -129,6 +138,7 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		assertEquals(CLIENT_TYPE2, retrievedProviderInfo.getClientType());
 		assertEquals(SMS_DESTINATION_NUMBER2, retrievedProviderInfo.getSmsDestinationNumber());
 		assertEquals(SMS_DESTINATION_PORT2, retrievedProviderInfo.getSmsDestinationPort());
+        assertEquals(SMS_SERVICE_CENTER2, retrievedProviderInfo.getSmsServiceCenter());
 		assertEquals(NETWORK_OPERATOR2, retrievedProviderInfo.getNetworkOperator());
 		assertEquals(DATE_FORMAT2, retrievedProviderInfo.getDateFormat());
 		assertEquals(IS_CURRENT_PROVIDER2, retrievedProviderInfo.isCurrentProvider());
@@ -185,7 +195,8 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		assertEquals(CLIENT_TYPE, providerInfo.getClientType());
 		assertEquals(SMS_DESTINATION_NUMBER, providerInfo.getSmsDestinationNumber());
 		assertEquals(SMS_DESTINATION_PORT, providerInfo.getSmsDestinationPort());
-		assertEquals(NETWORK_OPERATOR, providerInfo.getNetworkOperator());
+        assertEquals(SMS_SERVICE_CENTER, providerInfo.getSmsServiceCenter());
+        assertEquals(NETWORK_OPERATOR, providerInfo.getNetworkOperator());
 		assertEquals(DATE_FORMAT, providerInfo.getDateFormat());
 		assertEquals(true, providerInfo.isCurrentProvider());
 		
@@ -202,7 +213,8 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		assertEquals(CLIENT_TYPE, providerInfo.getClientType());
 		assertEquals(SMS_DESTINATION_NUMBER, providerInfo.getSmsDestinationNumber());
 		assertEquals(SMS_DESTINATION_PORT, providerInfo.getSmsDestinationPort());
-		assertEquals(NETWORK_OPERATOR, providerInfo.getNetworkOperator());
+        assertEquals(SMS_SERVICE_CENTER, providerInfo.getSmsServiceCenter());
+        assertEquals(NETWORK_OPERATOR, providerInfo.getNetworkOperator());
 		assertEquals(DATE_FORMAT, providerInfo.getDateFormat());
 		assertEquals(true, providerInfo.isCurrentProvider());
 	}
@@ -235,7 +247,8 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		assertEquals(CLIENT_TYPE2, secondProviderInfo.getClientType());
 		assertEquals(SMS_DESTINATION_NUMBER2, secondProviderInfo.getSmsDestinationNumber());
 		assertEquals(SMS_DESTINATION_PORT2, secondProviderInfo.getSmsDestinationPort());
-		assertEquals(NETWORK_OPERATOR, secondProviderInfo.getNetworkOperator());
+        assertEquals(SMS_SERVICE_CENTER2, secondProviderInfo.getSmsServiceCenter());
+        assertEquals(NETWORK_OPERATOR, secondProviderInfo.getNetworkOperator());
 		assertEquals(DATE_FORMAT2, secondProviderInfo.getDateFormat());
 		assertEquals(IS_CURRENT_PROVIDER2, secondProviderInfo.isCurrentProvider());
 

@@ -23,6 +23,8 @@ import com.orange.labs.uk.omtp.logging.Logger;
 import com.orange.labs.uk.omtp.protocol.Omtp;
 import com.orange.labs.uk.omtp.protocol.OmtpUtil;
 
+import javax.annotation.Nullable;
+
 /**
  * An immutable data object representing an OMTP Voicemail Provider. A Provider is defined by the
  * network operator that provides the service. It also contains various settings necessary to
@@ -38,12 +40,13 @@ public class OmtpProviderInfo implements Parcelable {
 	private String mClientType;
 	private String mSmsDestinationNumber;
 	private short mSmsDestinationPort;
+    private String mSmsServiceCenter;
 	private String mDateFormat;
 	private boolean mIsCurrentProvider;
 
 	private OmtpProviderInfo(String providerName, String networkOperator,
 			Omtp.ProtocolVersion protocolVersion, String clientType, String smsDestinationNumber,
-			short smsDestinationPort, String dateFormat, boolean isCurrentProvider) {
+			short smsDestinationPort, String smsServiceCenter, String dateFormat, boolean isCurrentProvider) {
 
 		mProviderName = checkNull("Couldn't instantiate OmtpProviderInfo, providerName is missing", providerName);
 		mNetworkOperator = checkNull("Couldn't instantiate OmtpProviderInfo, networkOperator is missing", networkOperator);
@@ -51,6 +54,7 @@ public class OmtpProviderInfo implements Parcelable {
 		mClientType = checkNull("Couldn't instantiate OmtpProviderInfo, clientType is missing", clientType);
 		mSmsDestinationNumber = checkNull("Couldn't instantiate OmtpProviderInfo, smsDestinationNumber is missing", smsDestinationNumber);
 		mSmsDestinationPort = smsDestinationPort;
+        mSmsServiceCenter = smsServiceCenter; // can be null
 		mDateFormat = checkNull("Couldn't instantiate OmtpProviderInfo, dateFormat is missing", dateFormat);
 		mIsCurrentProvider = isCurrentProvider;
 	}
@@ -63,10 +67,14 @@ public class OmtpProviderInfo implements Parcelable {
 	}
 
 	public String toString() {
-		return "OMTP Provider [mNetworkOperator: " + mNetworkOperator + ", mProviderName: "
-				+ mProviderName + ", mProtocolVersion: " + mProtocolVersion + ", mClientType: "
-				+ mClientType + ", mSmsDestination: " + mSmsDestinationNumber
-				+ ", mSmsDestinationPort: " + mSmsDestinationPort + ", mDateFormat: " + mDateFormat
+		return "OMTP Provider [mNetworkOperator: " + mNetworkOperator
+                + ", mProviderName: " + mProviderName
+                + ", mProtocolVersion: " + mProtocolVersion
+                + ", mClientType: "	+ mClientType
+                + ", mSmsDestination: " + mSmsDestinationNumber
+				+ ", mSmsDestinationPort: " + mSmsDestinationPort
+                + ", mSmsServiceCenter: " + mSmsServiceCenter
+                + ", mDateFormat: " + mDateFormat
 				+ ", mIsCurrentProvider: " + mIsCurrentProvider
 				+ "]";
 	}
@@ -95,7 +103,12 @@ public class OmtpProviderInfo implements Parcelable {
 		return mSmsDestinationPort;
 	}
 
-	public String getDateFormat() {
+    @Nullable
+    public String getSmsServiceCenter() {
+        return mSmsServiceCenter;
+    }
+
+    public String getDateFormat() {
 		return mDateFormat;
 	}
 	
@@ -116,7 +129,8 @@ public class OmtpProviderInfo implements Parcelable {
 		private String mClientType;
 		private String mSmsDestinationNumber;
 		private short mSmsDestinationPort;
-		private String mDateFormat;
+        private String mSmsServiceCenter;
+        private String mDateFormat;
 		private boolean mIsCurrentProvider;
 
 		public Builder setProviderName(String providerName) {
@@ -149,7 +163,12 @@ public class OmtpProviderInfo implements Parcelable {
 			return this;
 		}
 
-		public Builder setDateFormat(String dateFormat) {
+        public Builder setSmsServiceCenter(String smsServiceCenter) {
+            mSmsServiceCenter = smsServiceCenter;
+            return this;
+        }
+
+        public Builder setDateFormat(String dateFormat) {
 			mDateFormat = dateFormat;
 			return this;
 		}
@@ -171,14 +190,22 @@ public class OmtpProviderInfo implements Parcelable {
 					OmtpProviderColumns.SMS_DESTINATION_NUMBER, cursor);
 			mSmsDestinationPort = getShortValueFromCursor(OmtpProviderColumns.SMS_DESTINATION_PORT,
 					cursor);
+            mSmsServiceCenter = getStringValueFromCursor(OmtpProviderColumns.SMS_SERVICE_CENTER,
+                    cursor);
 			mDateFormat = getStringValueFromCursor(OmtpProviderColumns.DATE_FORMAT, cursor);
 			mIsCurrentProvider = getBooleanValueFromCursor(OmtpProviderColumns.IS_CURRENT_PROVIDER, cursor);
 			return this;
 		}
 
+        @Nullable
 		private String getStringValueFromCursor(OmtpProviderColumns column, Cursor cursor) {
 			int columnIndex = cursor.getColumnIndex(column.getColumnName());
-			return cursor.getString(columnIndex);
+            if(cursor.isNull(columnIndex)) {
+                return null;
+            }
+            else {
+                return cursor.getString(columnIndex);
+            }
 		}
 
 		private short getShortValueFromCursor(OmtpProviderColumns column, Cursor cursor) {
@@ -202,7 +229,8 @@ public class OmtpProviderInfo implements Parcelable {
 				mClientType = providerInfo.getClientType();
 				mSmsDestinationNumber = providerInfo.getSmsDestinationNumber();
 				mSmsDestinationPort = providerInfo.getSmsDestinationPort();
-				mDateFormat = providerInfo.getDateFormat();
+                mSmsServiceCenter = providerInfo.getSmsServiceCenter();
+                mDateFormat = providerInfo.getDateFormat();
 				mIsCurrentProvider = providerInfo.isCurrentProvider();
 			}
 			return this;
@@ -218,7 +246,8 @@ public class OmtpProviderInfo implements Parcelable {
 			OmtpProviderInfo provider = null;
 			try {
 				provider = new OmtpProviderInfo(mProviderName, mNetworkOperator, mProtocolVersion,
-						mClientType, mSmsDestinationNumber, mSmsDestinationPort, mDateFormat, mIsCurrentProvider);
+						mClientType, mSmsDestinationNumber, mSmsDestinationPort, mSmsServiceCenter,
+                        mDateFormat, mIsCurrentProvider);
 			} catch (IllegalArgumentException e) {
 				sLogger.w("Missing required parameter when building a OmtpProviderInfo object");
 			}
@@ -228,14 +257,26 @@ public class OmtpProviderInfo implements Parcelable {
 	}
 	
 	private OmtpProviderInfo(Parcel in) {
-        this(	in.readString(),
-        		in.readString(),
-        		OmtpUtil.omtpValueToEnumValue(in.readString(), Omtp.ProtocolVersion.class),
-				in.readString(),
-				in.readString(),
-				(short) in.readInt(),
-				in.readString(),
-				(in.readInt() != 0));
+        String providerName = in.readString();
+        String networkOperator = in.readString();
+        Omtp.ProtocolVersion protocolVersion = OmtpUtil.omtpValueToEnumValue(in.readString(), Omtp.ProtocolVersion.class);
+        String clientType = in.readString();
+        String smsDestinationNumber = in.readString();
+        short smsDestinationPort = (short) in.readInt();
+        // Use readValue as it may be null
+        String smsServiceCenter = (String) in.readValue(String.class.getClassLoader());
+        String dateFormat = in.readString();
+        boolean isCurrentProvider = (in.readInt() != 0);
+
+        mProviderName = checkNull("Couldn't instantiate OmtpProviderInfo, providerName is missing", providerName);
+        mNetworkOperator = checkNull("Couldn't instantiate OmtpProviderInfo, networkOperator is missing", networkOperator);
+        mProtocolVersion = checkNull("Couldn't instantiate OmtpProviderInfo, protocolVersion is missing", protocolVersion);
+        mClientType = checkNull("Couldn't instantiate OmtpProviderInfo, clientType is missing", clientType);
+        mSmsDestinationNumber = checkNull("Couldn't instantiate OmtpProviderInfo, smsDestinationNumber is missing", smsDestinationNumber);
+        mSmsDestinationPort = smsDestinationPort;
+        mSmsServiceCenter = smsServiceCenter; // can be null
+        mDateFormat = checkNull("Couldn't instantiate OmtpProviderInfo, dateFormat is missing", dateFormat);
+        mIsCurrentProvider = isCurrentProvider;
     }
 
 	public static final Parcelable.Creator<OmtpProviderInfo> CREATOR = new Parcelable.Creator<OmtpProviderInfo>() {
@@ -262,8 +303,9 @@ public class OmtpProviderInfo implements Parcelable {
 		dest.writeString(mProtocolVersion.getCode());
 		dest.writeString(mClientType);
 		dest.writeString(mSmsDestinationNumber);
-		dest.writeInt((int) mSmsDestinationPort);
-		dest.writeString(mDateFormat);
+        dest.writeInt((int) mSmsDestinationPort);
+        dest.writeValue(mSmsServiceCenter); // writeValue as it may be null
+        dest.writeString(mDateFormat);
 		dest.writeInt((mIsCurrentProvider ? 1:0));
 	};
 

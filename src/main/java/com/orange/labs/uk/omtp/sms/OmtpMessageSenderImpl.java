@@ -127,6 +127,9 @@ public final class OmtpMessageSenderImpl implements OmtpMessageSender {
 			destinationAddress = mProviderInfo.getSmsDestinationNumber();
 		}
 
+        // Get the Short message Service center number, it can be null
+        String shortMessageServiceCenterNumber = mProviderInfo.getSmsServiceCenter();
+
 		// create PendingIntent for SMS sent status
 		Intent intentSmsSendStatus = new Intent(SMS_SENT_STATUS_ACTION);
 		PendingIntent sentIntent = PendingIntent.getBroadcast(mContext, 0, intentSmsSendStatus,
@@ -135,8 +138,8 @@ public final class OmtpMessageSenderImpl implements OmtpMessageSender {
 		// If application port is set to 0 then send simple text message, else
 		// send data message.
 		if (mProviderInfo.getSmsDestinationPort() == 0) {
-			logger.d(String.format("Sending TEXT sms '%s' to %s", text, destinationAddress));
-			mSmsManager.sendTextMessage(destinationAddress, null, text, sentIntent, null);
+			logger.d(String.format("Sending TEXT sms '%s' to %s via sc: %s", text, destinationAddress, shortMessageServiceCenterNumber));
+			mSmsManager.sendTextMessage(destinationAddress, shortMessageServiceCenterNumber, text, sentIntent, null);
 		} else {
 			byte[] data;
 			try {
@@ -144,9 +147,9 @@ public final class OmtpMessageSenderImpl implements OmtpMessageSender {
 			} catch (UnsupportedEncodingException e) {
 				throw new IllegalStateException("Failed to encode: " + text);
 			}
-			logger.d(String.format("Sending BINARY sms '%s' to %s:%d", text, destinationAddress,
-					mProviderInfo.getSmsDestinationPort()));
-			mSmsManager.sendDataMessage(destinationAddress, null,
+			logger.d(String.format("Sending BINARY sms '%s' to %s:%d via sc: %s", text, destinationAddress,
+					mProviderInfo.getSmsDestinationPort(), shortMessageServiceCenterNumber));
+			mSmsManager.sendDataMessage(destinationAddress, shortMessageServiceCenterNumber,
 					mProviderInfo.getSmsDestinationPort(), data, sentIntent, null);
 
 		}
