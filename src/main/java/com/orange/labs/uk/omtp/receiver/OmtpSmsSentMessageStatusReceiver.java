@@ -40,7 +40,8 @@ public class OmtpSmsSentMessageStatusReceiver extends BroadcastReceiver {
 		if (getResultCode() == Activity.RESULT_OK) {
 			notifier.sendNotification(NotifChannelNotification.connectivityOk());
 			// schedule new SMS sent timeout
-			resolver.getSmsTimeoutHandler().createNewSmsTimeoutTask();
+			// resolver.getSmsTimeoutHandler().createNewSmsTimeoutTask();
+            resolver.getSmsTimeoutHandler().setSentSmsState();
 		} else {
 			// report SMS connectivity error
 			notifier.sendNotification(NotifChannelNotification.connectivityKo(context));

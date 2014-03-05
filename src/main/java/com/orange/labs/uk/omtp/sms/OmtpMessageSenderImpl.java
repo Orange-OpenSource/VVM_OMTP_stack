@@ -34,6 +34,7 @@ import com.orange.labs.uk.omtp.protocol.Omtp;
 import com.orange.labs.uk.omtp.protocol.Omtp.MoSmsRequest;
 import com.orange.labs.uk.omtp.provider.OmtpProviderInfo;
 import com.orange.labs.uk.omtp.proxy.OmtpSmsManagerProxy;
+import com.orange.labs.uk.omtp.sms.timeout.SmsTimeoutHandler;
 
 /**
  * Implementation of {@link OmtpMessageSender} interface.
@@ -53,7 +54,10 @@ public final class OmtpMessageSenderImpl implements OmtpMessageSender {
 	private final Context mContext;
 	private final Executor mExecutor;
 
-	/**
+    private final SmsTimeoutHandler mSmsTimeoutHandler;
+
+
+    /**
 	 * Creates a provider specific instance of MessageSender with values picked from the supplied
 	 * providerConfig.
 	 * <p>
@@ -70,17 +74,17 @@ public final class OmtpMessageSenderImpl implements OmtpMessageSender {
 	 * @param executor 
 	 * @param smsTimeoutHandler
 	 */
-	public OmtpMessageSenderImpl(OmtpSmsManagerProxy smsManager,
+	public OmtpMessageSenderImpl(OmtpSmsManagerProxy smsManager, SmsTimeoutHandler smsTimeoutHandler,
 			OmtpAccountStoreWrapper accountStoreWrapper, OmtpProviderInfo providerInfo,
 			SourceNotifier sourceNotifier, Context context, Executor executor) {
 		mProviderInfo = providerInfo;
 		mSmsManager = smsManager;
-		mAccountStore = accountStoreWrapper;
+        mSmsTimeoutHandler = smsTimeoutHandler;
+        mAccountStore = accountStoreWrapper;
 		mSourceNotifier = sourceNotifier;
 		mContext = context;
 		mClientPrefix = Omtp.CLIENT_PREFIX;
 		mExecutor = executor;
-
 	}
 
 	@Override
@@ -153,7 +157,9 @@ public final class OmtpMessageSenderImpl implements OmtpMessageSender {
 					mProviderInfo.getSmsDestinationPort(), data, sentIntent, null);
 
 		}
-	}
+
+        mSmsTimeoutHandler.setSendingSmsState();
+    }
 
 	// Evolution of MO messages.
 	//
