@@ -13,7 +13,5 @@ android {
                 'src/main/deps/jsr305/src'
             ]
         }
-
-        instrumentTest.setRoot('src/instrumentTest')
     }
 }
