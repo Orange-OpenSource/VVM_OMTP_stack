@@ -2,15 +2,20 @@ apply plugin: 'android-library'
 
 android {
     compileSdkVersion 14
-    buildToolsVersion "19.0.1"
+    buildToolsVersion "19.0.3"
 
     sourceSets {
+        /*
+        Can make something cleaner in Android studio 0.5.1,
+        see https://android-review.googlesource.com/#/c/84343/
+        https://code.google.com/p/android/issues/detail?id=66758
+        */
         main {
             manifest.srcFile 'src/main/AndroidManifest.xml'
             java.srcDirs = [
-                'src/main/java',
-                'src/main/deps/email/src',
-                'src/main/deps/jsr305/src'
+                    'src/main/java',
+                    'src/main/deps/email/src',
+                    'src/main/deps/jsr305/src'
             ]
         }
     }
