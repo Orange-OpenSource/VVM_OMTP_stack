@@ -4,6 +4,14 @@ android {
     compileSdkVersion 14
     buildToolsVersion "19.0.3"
 
+    buildTypes {
+        /*
+            Publish all variants (debug and release here) of the library so they are available to other project
+            http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Library-Publication
+         */
+        publishNonDefault true
+    }
+
     sourceSets {
         /*
         Can make something cleaner in Android studio 0.5.1,
