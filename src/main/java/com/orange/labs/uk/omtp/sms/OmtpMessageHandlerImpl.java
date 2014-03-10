@@ -15,14 +15,6 @@
  */
 package com.orange.labs.uk.omtp.sms;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-
-import javax.annotation.concurrent.ThreadSafe;
-
 import android.content.ContentProvider;
 import android.telephony.SmsMessage;
 
@@ -48,6 +40,14 @@ import com.orange.labs.uk.omtp.sync.VvmStore.Action;
 import com.orange.labs.uk.omtp.sync.VvmStoreActions;
 import com.orange.labs.uk.omtp.voicemail.Voicemail;
 import com.orange.labs.uk.omtp.voicemail.VoicemailImpl;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Omtp SMS handler. Handles SYNC and STATUS messages and takes appropriate action.
@@ -102,7 +102,7 @@ public class OmtpMessageHandlerImpl implements OmtpMessageHandler, OmtpMessage.V
 		// servers. Make sure we can handle both.
 		logger.d("Num msgs:" + omtpSmsPdus.length);
 
-		resetTimeoutAndNotify();
+        notifySmsReceived();
 
 		String smsOriginatorNumber = null;
 		StringBuilder userData = new StringBuilder();
@@ -134,8 +134,8 @@ public class OmtpMessageHandlerImpl implements OmtpMessageHandler, OmtpMessage.V
 	 * Method that should be executed when a SMS is received. Timeout handler should be cancelled
 	 * and a notification should be broadcast to indicate the notificatoin channel works perfectly.
 	 */
-	private void resetTimeoutAndNotify() {
-		mSmsTimeoutHandler.cancelOldSmsTimeoutTask();
+	private void notifySmsReceived() {
+		mSmsTimeoutHandler.setSmsReceivedState();
 		mSourceNotifier.sendNotification(NotifChannelNotification.connectivityOk());
 	}
 

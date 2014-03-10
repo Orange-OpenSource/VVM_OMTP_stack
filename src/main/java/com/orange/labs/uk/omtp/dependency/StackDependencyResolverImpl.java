@@ -15,14 +15,6 @@
  */
 package com.orange.labs.uk.omtp.dependency;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.annotation.Nullable;
-
 import android.content.Context;
 import android.telephony.SmsManager;
 
@@ -76,6 +68,14 @@ import com.orange.labs.uk.omtp.sync.policies.NoLocalDeletionResolvePolicy;
 import com.orange.labs.uk.omtp.voicemail.LocalVoicemailProvider;
 import com.orange.labs.uk.omtp.voicemail.LocalVoicemailProviderImpl;
 import com.orange.labs.uk.omtp.voicemail.database.MirrorVoicemailProvider;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.annotation.Nullable;
 
 /**
  * Concrete implementation of the {@link StackDependencyResolver} interface.
@@ -301,8 +301,8 @@ public class StackDependencyResolverImpl implements StackDependencyResolver {
 		OmtpProviderInfo providerInfo = getProviderStore().getProviderInfo();
 		if (providerInfo != null) {
 			return new OmtpMessageSenderImpl(new OmtpSmsManagerProxyImpl(SmsManager.getDefault()),
-					getAccountStore(), providerInfo, getSourceNotifier(), getAppContext(),
-					getExecutorService());
+                    getSmsTimeoutHandler(), getAccountStore(), providerInfo, getSourceNotifier(),
+                    getAppContext(), getExecutorService());
 		} else {
 			logger.w("OmtpMessageSenderImpl has not ben created! providerInfo is null!");
 			SourceNotifier sourceNotifier = getSourceNotifier();
