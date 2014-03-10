@@ -1,14 +1,12 @@
 package com.orange.labs.uk.omtp.config;
 
-import com.orange.labs.uk.omtp.BuildConfig;
-
 public final class StackStaticConfiguration {
 
     /**
      * Define if the stack is running in debug mode, which means a large amount of logs are written
      * to give feedback on what's going on under the hood.
      */
-    public static final boolean DEBUG_MODE = BuildConfig.DEBUG;
+    public static final boolean DEBUG_MODE = true;
 
     /**
      * Define if we should accept messages that do not contain a voice payload.
