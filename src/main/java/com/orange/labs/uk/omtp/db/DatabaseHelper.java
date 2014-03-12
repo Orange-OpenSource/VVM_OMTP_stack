@@ -34,7 +34,6 @@ import com.orange.labs.uk.omtp.voicemail.database.MirrorVoicemailProviderColumns
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executor;
 
 /**
  * Helper class to create a database helper for a set of columns.
