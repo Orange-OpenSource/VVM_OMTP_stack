@@ -278,10 +278,6 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
     @Override
     public synchronized boolean updateProviderInfo(final OmtpProviderInfo providerInfo) {
 
-        // check if providers table exists and create it if not before inserting
-        // any data to it
-        mDatabaseHelper.checkIfTableExists(PROVIDERS_TABLE_NAME);
-
         logger.d(String.format("Inserting/Updating provider information named: %s",
                 providerInfo.getProviderName()));
 

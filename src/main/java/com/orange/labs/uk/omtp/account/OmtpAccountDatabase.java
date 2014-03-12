@@ -15,9 +15,6 @@
  */
 package com.orange.labs.uk.omtp.account;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -27,6 +24,9 @@ import android.database.sqlite.SQLiteException;
 import com.orange.labs.uk.omtp.db.DatabaseHelper;
 import com.orange.labs.uk.omtp.logging.Logger;
 import com.orange.labs.uk.omtp.utils.CloseUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OmtpAccountDatabase implements OmtpAccountStore {
 
@@ -42,9 +42,7 @@ public class OmtpAccountDatabase implements OmtpAccountStore {
 
 	@Override
 	public boolean updateAccountInfo(final OmtpAccountInfo accountInfo) {
-		
-		mDatabaseHelper.checkIfTableExists(ACCOUNT_TABLE_NAME);
-		
+
 		SQLiteDatabase database = null;
 		try {
 			database = mDatabaseHelper.getWritableDatabase();
@@ -77,8 +75,6 @@ public class OmtpAccountDatabase implements OmtpAccountStore {
 	public List<OmtpAccountInfo> getAllAccounts() {
 		logger.d("Retrieving all accounts from the database");
 
-		mDatabaseHelper.checkIfTableExists(ACCOUNT_TABLE_NAME);
-		
 		List<OmtpAccountInfo> accounts = new ArrayList<OmtpAccountInfo>();
 
 		SQLiteDatabase database = null;
@@ -107,8 +103,6 @@ public class OmtpAccountDatabase implements OmtpAccountStore {
 
 	@Override
 	public OmtpAccountInfo getAccountInfo(final String accountId) {
-		
-		mDatabaseHelper.checkIfTableExists(ACCOUNT_TABLE_NAME);
 
 		logger.d(String.format("Retrieving account with ID: %s", accountId));
 

@@ -57,7 +57,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	DB_COLUMNS.put(MirrorVoicemailProvider.VOICEMAIL_TABLE_NAME, MirrorVoicemailProviderColumns.values());
     	DB_COLUMNS.put(LocalGreetingsProvider.GREETINGS_TABLE_NAME, LocalGreetingsProviderColumns.values());
     }
-    		
 	
     /** The version of the database to create. */
     private final int mVersion;
@@ -87,11 +86,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(final SQLiteDatabase db) {
         logger.d("onCreate() on db called");
         for (TableCreator tableCreator : mTableCreators) {
-            if (!(tableCreator.getTableName().equals(OmtpProviderDatabase.PROVIDERS_TABLE_NAME) ||
-                    tableCreator.getTableName().equals(OmtpAccountDatabase.ACCOUNT_TABLE_NAME))){
-                logger.d(String.format("Creating table %s.", tableCreator.getTableName()));
-                db.execSQL(tableCreator.getCreateTableQuery(mVersion));
-            }
+            logger.d(String.format("Creating table %s.", tableCreator.getTableName()));
+            db.execSQL(tableCreator.getCreateTableQuery(mVersion));
         }
     }
 
@@ -118,22 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL(upgradeTableQuery);
         }
 	}
-    
-    /**
-     * Checks the existence of a table and creates it if it has not been already created.
-     * @param table name
-     */
-	public void checkIfTableExists(String tableName) {
-		TableCreator tableCreator = new TableCreator(tableName, DB_COLUMNS.get(tableName));
-		
-		SQLiteDatabase db = getWritableDatabase();
-		if (!tableAlreadyExists(db, tableCreator)) {
-			logger.d(String.format("%s table didn't exist, creating it now", tableName));
-			db.execSQL(tableCreator.getCreateTableQuery(mVersion));
-		}
-	}
-    
-    
+
     private boolean tableAlreadyExists(SQLiteDatabase db, TableCreator tableCreator) {
     	String tableExistsCheckQuery = tableCreator.getTableExistsCheckQuery();
     	Cursor cursor = null;
