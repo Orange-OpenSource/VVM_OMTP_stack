@@ -15,11 +15,6 @@
  */
 package com.orange.labs.uk.omtp.db;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.Executor;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -35,6 +30,11 @@ import com.orange.labs.uk.omtp.provider.OmtpProviderDatabase;
 import com.orange.labs.uk.omtp.utils.CloseUtils;
 import com.orange.labs.uk.omtp.voicemail.database.MirrorVoicemailProvider;
 import com.orange.labs.uk.omtp.voicemail.database.MirrorVoicemailProviderColumns;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * Helper class to create a database helper for a set of columns.
@@ -89,22 +89,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(final SQLiteDatabase db) {
-    	
-    	mExecutor.execute(new Runnable() {
-			
-			@Override
-			public void run() {
-				logger.d("onCreate() on db called");
-				for (TableCreator tableCreator : mTableCreators) {
-					if (!(tableCreator.getTableName().equals(OmtpProviderDatabase.PROVIDERS_TABLE_NAME) ||
-							tableCreator.getTableName().equals(OmtpAccountDatabase.ACCOUNT_TABLE_NAME))){
-						logger.d(String.format("Creating table %s.", tableCreator.getTableName()));
-						db.execSQL(tableCreator.getCreateTableQuery(mVersion));
-					}
-				}
-			}
-		});
-    	
+        logger.d("onCreate() on db called");
+        for (TableCreator tableCreator : mTableCreators) {
+            if (!(tableCreator.getTableName().equals(OmtpProviderDatabase.PROVIDERS_TABLE_NAME) ||
+                    tableCreator.getTableName().equals(OmtpAccountDatabase.ACCOUNT_TABLE_NAME))){
+                logger.d(String.format("Creating table %s.", tableCreator.getTableName()));
+                db.execSQL(tableCreator.getCreateTableQuery(mVersion));
+            }
+        }
     }
 
     @Override
