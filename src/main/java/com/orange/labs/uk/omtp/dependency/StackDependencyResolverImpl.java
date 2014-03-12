@@ -172,7 +172,7 @@ public class StackDependencyResolverImpl implements StackDependencyResolver {
 	 */
 	protected StackDependencyResolverImpl(final Context appContext) {
 		mApplicationContext = appContext;
-		mProviderDatabaseHelper = new DatabaseHelper(mApplicationContext, getExecutorService());
+		mProviderDatabaseHelper = new DatabaseHelper(mApplicationContext);
 	}
 
 	@Override

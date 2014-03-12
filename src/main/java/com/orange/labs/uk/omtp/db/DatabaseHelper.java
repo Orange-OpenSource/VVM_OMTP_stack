@@ -64,16 +64,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private final int mVersion;
     /** A helper object to create the table. */
     private ArrayList<TableCreator> mTableCreators;
-    /** executor used to execute actions on separate threads */
-	private Executor mExecutor;
 
-    public DatabaseHelper(Context context, Executor executor) {
+    public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
 
         mVersion = DB_VERSION;
         mTableCreators = new ArrayList<TableCreator>();
-        mExecutor = executor;
-        
+
         generateTableCreators();
     }
 
