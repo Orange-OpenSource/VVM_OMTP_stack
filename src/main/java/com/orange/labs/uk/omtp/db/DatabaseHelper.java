@@ -101,34 +101,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-    	
-    	mExecutor.execute(new Runnable() {
-			
-			@Override
-			public void run() {
-				logger.d(String.format("onUpgrage() on db called with oldVersion=%d, newVersion=%d",
-						oldVersion, newVersion));
-				List<String> upgradeTableQueryList = new ArrayList<String>();
-				for (TableCreator tableCreator : mTableCreators) {
-					logger.d(String.format("processing TableCreator for table:%s", tableCreator.getTableName()));
-					// check if table already exists in the db
-					if (!tableAlreadyExists(db, tableCreator)) {
-						// try to create new tables for this version, and add it on the top of the list
-						upgradeTableQueryList.add(0, tableCreator.getCreateTableQuery(newVersion));
-					} else {
-						// get SQL queries for existing tables (to add new columns)
-						upgradeTableQueryList.addAll(tableCreator.getUpgradeTableQuery(oldVersion,
-								newVersion));
-					}
-				}
-				// execute queries
-				for (String upgradeTableQuery : upgradeTableQueryList) {
-					logger.d(String.format("Executing db update with query:%s", upgradeTableQuery));
-					db.execSQL(upgradeTableQuery);
-				}
-			}
-		});
-    	
+        logger.d(String.format("onUpgrage() on db called with oldVersion=%d, newVersion=%d",
+                oldVersion, newVersion));
+        List<String> upgradeTableQueryList = new ArrayList<String>();
+        for (TableCreator tableCreator : mTableCreators) {
+            logger.d(String.format("processing TableCreator for table:%s", tableCreator.getTableName()));
+            // check if table already exists in the db
+            if (!tableAlreadyExists(db, tableCreator)) {
+                // try to create new tables for this version, and add it on the top of the list
+                upgradeTableQueryList.add(0, tableCreator.getCreateTableQuery(newVersion));
+            } else {
+                // get SQL queries for existing tables (to add new columns)
+                upgradeTableQueryList.addAll(tableCreator.getUpgradeTableQuery(oldVersion,
+                        newVersion));
+            }
+        }
+        // execute queries
+        for (String upgradeTableQuery : upgradeTableQueryList) {
+            logger.d(String.format("Executing db update with query:%s", upgradeTableQuery));
+            db.execSQL(upgradeTableQuery);
+        }
 	}
     
     /**
