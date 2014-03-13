@@ -28,15 +28,15 @@ public interface OmtpAccountStoreWrapper {
 
 	 /**
      * Updates the account store with the account info data set in the supplied
-     * {@link com.google.android.voicemail.example.storage.AccountInfo.Builder}.
+     * {@link com.orange.labs.uk.omtp.account.OmtpAccountInfo.Builder}.
      * All necessary fields other than the accountId must be already
      * set in the builder. This method will internally set the accountId for you.
      *
-     * @see AccountStore#updateAccountInfo(OmtpAccountInfo)
+     * @see OmtpAccountStore#updateAccountInfo(OmtpAccountInfo)
      */
     public void updateAccountInfo(OmtpAccountInfo.Builder accountInfoBuilder);
 
-    /** @see AccountStore#getAccountInfo(String) */
+    /** @see OmtpAccountStore#getAccountInfo(String) */
     @Nullable
     public OmtpAccountInfo getAccountInfo();
     
