@@ -205,7 +205,7 @@ public class StackDependencyResolverImpl implements StackDependencyResolver {
 	public synchronized OmtpProviderWrapper getProviderStore() {
 		if (mProviderStore == null) {
 			mProviderStore = new OmtpProviderWrapperImpl(new OmtpProviderDatabase(
-					getProviderDatabaseHelper()), getTelephonyManager(), getSingleExecutorService());
+					getProviderDatabaseHelper()), getTelephonyManager());
 		}
 
 		return mProviderStore;

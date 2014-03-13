@@ -15,19 +15,15 @@
  */
 package com.orange.labs.uk.omtp.provider;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-
-import javax.annotation.Nullable;
-
 import android.telephony.TelephonyManager;
 
 import com.orange.labs.uk.omtp.logging.Logger;
 import com.orange.labs.uk.omtp.proxy.OmtpTelephonyManagerProxy;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  *	Implementation of {@link OmtpProviderWrapper} that uses the Android {@link TelephonyManager}
@@ -49,16 +45,10 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 	 */
 	private final OmtpProviderStore mProviderStore;
 
-	/**
-	 * Thread pool used to launch providers update operations.
-	 */
-	private final ExecutorService mExecutorService;
 
-	public OmtpProviderWrapperImpl(OmtpProviderStore store, OmtpTelephonyManagerProxy tm,
-			ExecutorService executorService) {
+	public OmtpProviderWrapperImpl(OmtpProviderStore store, OmtpTelephonyManagerProxy tm) {
 		mProviderStore = store;
 		mTelephonyManager = tm;
-		mExecutorService = executorService;
 	}
 
     /**
@@ -129,7 +119,7 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 		
 		boolean inserted = true;
 		for (OmtpProviderInfo provider : providers) {
-			boolean result = updateProviderOnThreadPool(provider);
+			boolean result = updateProviderInfo(provider);
 			inserted = inserted && result;
 		}
 		return inserted;
@@ -140,64 +130,10 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 	 */
 	@Override
 	public boolean updateProviderInfo(OmtpProviderInfo infos) {
-		return updateProviderOnThreadPool(infos);
-	}
-	
-	/**
-	 * Updates Provider info using a ThreadPool.
-	 * 
-	 * @return true if update was successful
-	 */
-	private boolean updateProviderOnThreadPool(final OmtpProviderInfo provider) {
-		
-		Future<Boolean> future = mExecutorService.submit(new Callable<Boolean>() {
-
-			@Override
-			public Boolean call() throws Exception {
-				return mProviderStore.updateProviderInfo(provider);
-			}
-		});
-				
-		try {
-			return future.get();
-		} catch (InterruptedException e) {
-			logger.w("Impossible to get providerInfo InterruptedException");
-			// Re-assert the thread's interrupted status
-            Thread.currentThread().interrupt();
-            // We don't need the result, so cancel the task too
-            future.cancel(true);
-		} catch (ExecutionException e) {
-			logger.e("Impossible to get providerInfo ExecutionException");
-			e.printStackTrace();
-		}
-		return false;
+        return mProviderStore.updateProviderInfo(infos);
 	}
 
 	public boolean removeProviderInfo(OmtpProviderInfo infos) {
-		return removeProviderInfoOnThreadPool(infos);
-	}
-	
-	private boolean removeProviderInfoOnThreadPool(final OmtpProviderInfo infos) {
-		Future<Boolean> future = mExecutorService.submit(new Callable<Boolean>() {
-
-			@Override
-			public Boolean call() throws Exception {
-				return mProviderStore.removeProviderInfo(infos);
-			}
-		});
-
-		try {
-			return future.get();
-		} catch (InterruptedException e) {
-			logger.w("Impossible to remove providerInfo InterruptedException");
-			// Re-assert the thread's interrupted status
-            Thread.currentThread().interrupt();
-            // We don't need the result, so cancel the task too
-            future.cancel(true);
-		} catch (ExecutionException e) {
-			logger.e("Impossible to remove providerInfo ExecutionException");
-			e.printStackTrace();
-		}
-		return false;
-	}
+        return mProviderStore.removeProviderInfo(infos);
+    }
 }
