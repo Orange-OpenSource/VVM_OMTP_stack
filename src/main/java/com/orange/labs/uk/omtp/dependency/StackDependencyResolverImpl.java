@@ -162,8 +162,6 @@ public class StackDependencyResolverImpl implements StackDependencyResolver {
 
 	private GreetingsHelper mGreetingsHelper;
 
-
-
 	/**
 	 * Private Constructor
 	 * 
@@ -217,7 +215,7 @@ public class StackDependencyResolverImpl implements StackDependencyResolver {
 	public synchronized OmtpAccountStoreWrapper getAccountStore() {
 		if (mAccountStore == null) {
 			mAccountStore = new OmtpAccountStoreWrapperImpl(new OmtpAccountDatabase(
-					getProviderDatabaseHelper()), getTelephonyManager(), getSingleExecutorService());
+					getProviderDatabaseHelper()), getTelephonyManager());
 		}
 		return mAccountStore;
 	}

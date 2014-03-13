@@ -42,13 +42,9 @@ public class OmtpAccountStoreWrapperImpl implements OmtpAccountStoreWrapper {
 	
 	private OmtpTelephonyManagerProxy mTelephonyManager;
 
-	private ExecutorService mExecutorsService;
-	
-	public OmtpAccountStoreWrapperImpl(OmtpAccountStore store, OmtpTelephonyManagerProxy tm,
-			ExecutorService executorService) {
+	public OmtpAccountStoreWrapperImpl(OmtpAccountStore store, OmtpTelephonyManagerProxy tm) {
 		mAccountStore = store;
 		mTelephonyManager = tm;
-		mExecutorsService = executorService;
 	}
 	
 	/**
@@ -61,13 +57,7 @@ public class OmtpAccountStoreWrapperImpl implements OmtpAccountStoreWrapper {
 		
 		if (accountId != null) {
 			accountInfoBuilder.setAccountId(accountId);
-			mExecutorsService.execute(new Runnable() {
-				
-				@Override
-				public void run() {
-					mAccountStore.updateAccountInfo(accountInfoBuilder.build());
-				}
-			});
+			mAccountStore.updateAccountInfo(accountInfoBuilder.build());
 		} else {
 			logger.w("It has not been possible to get account ID (users MSISDN). Account info not updated!");
 		}
@@ -78,32 +68,7 @@ public class OmtpAccountStoreWrapperImpl implements OmtpAccountStoreWrapper {
 	 */
 	@Override
 	public List<OmtpAccountInfo> getAllAccounts() {
-
-		List<OmtpAccountInfo> accountsInfoList = new ArrayList<OmtpAccountInfo>();
-
-		Future<List<OmtpAccountInfo>> future = mExecutorsService
-				.submit(new Callable<List<OmtpAccountInfo>>() {
-
-					@Override
-					public List<OmtpAccountInfo> call() throws Exception {
-						return mAccountStore.getAllAccounts();
-					}
-				});
-
-		// get the accountsInfoList from the Future
-		try {
-			accountsInfoList = future.get();
-		} catch (InterruptedException e) {
-			logger.w("Impossible to get accountsInfoList InterruptedException");
-			// Re-assert the thread's interrupted status
-			Thread.currentThread().interrupt();
-			// We don't need the result, so cancel the task too
-			future.cancel(true);
-		} catch (ExecutionException e) {
-			logger.e("Impossible to get accountsInfoList ExecutionException");
-			e.printStackTrace();
-		}
-		return accountsInfoList;
+		return mAccountStore.getAllAccounts();
 	}
 	
 	/**
@@ -112,33 +77,11 @@ public class OmtpAccountStoreWrapperImpl implements OmtpAccountStoreWrapper {
 	@Override
 	public OmtpAccountInfo getAccountInfo() {
 		final String msisdn = getAccountId();
-		OmtpAccountInfo accountInfo = null;
-		
-		Future<OmtpAccountInfo> future = mExecutorsService.submit(new Callable<OmtpAccountInfo>() {
 
-			@Override
-			public OmtpAccountInfo call() throws Exception {
-				if (msisdn != null) {
-					return mAccountStore.getAccountInfo(msisdn);
-				}
-				return null;
-			}
-		});
-
-		// get the accountInfor from the Future
-		try {
-			accountInfo = future.get();
-		} catch (InterruptedException e) {
-			logger.w("Impossible to get accountInfo InterruptedException");
-			// Re-assert the thread's interrupted status
-            Thread.currentThread().interrupt();
-            // We don't need the result, so cancel the task too
-            future.cancel(true);
-		} catch (ExecutionException e) {
-			logger.e("Impossible to get accountInfo ExecutionException");
-			e.printStackTrace();
-		}
-		return (msisdn == null) ? null : accountInfo;
+        if (msisdn != null) {
+            return mAccountStore.getAccountInfo(msisdn);
+        }
+        return null;
 	}
 
 	/**
