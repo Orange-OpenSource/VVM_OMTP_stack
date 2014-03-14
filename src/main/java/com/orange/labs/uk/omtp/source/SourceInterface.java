@@ -1,15 +1,15 @@
 package com.orange.labs.uk.omtp.source;
 
+import com.orange.labs.uk.omtp.account.OmtpAccountInfo;
+import com.orange.labs.uk.omtp.greetings.GreetingType;
+import com.orange.labs.uk.omtp.greetings.GreetingUpdateType;
+import com.orange.labs.uk.omtp.provider.OmtpProviderInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-
-import com.orange.labs.uk.omtp.account.OmtpAccountInfo;
-import com.orange.labs.uk.omtp.greetings.GreetingType;
-import com.orange.labs.uk.omtp.greetings.GreetingUpdateType;
-import com.orange.labs.uk.omtp.provider.OmtpProviderInfo;
 
 /**
  * Interface that describes the commands that can be executed by the OMTP stack. A source can use
@@ -117,7 +117,7 @@ public interface SourceInterface {
 	 * the NEW status to the READY status. This command should typically be sent after the tutorial
 	 * has been done by the user.
 	 */
-	public abstract void requestCloseNut();
+	public abstract void requestCloseNutAsync();
 
 	/**
 	 * Trigger a full synchronization with the remote OMTP platform.

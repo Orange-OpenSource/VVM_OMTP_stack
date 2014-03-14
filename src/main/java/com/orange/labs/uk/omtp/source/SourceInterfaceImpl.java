@@ -1,11 +1,5 @@
 package com.orange.labs.uk.omtp.source;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import android.content.Context;
 
 import com.orange.labs.uk.omtp.account.OmtpAccountInfo;
@@ -18,6 +12,12 @@ import com.orange.labs.uk.omtp.logging.Logger;
 import com.orange.labs.uk.omtp.provider.OmtpProviderInfo;
 import com.orange.labs.uk.omtp.sms.OmtpMessageSender;
 import com.orange.labs.uk.omtp.sync.SerialSynchronizer.SyncFlag;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 public class SourceInterfaceImpl implements SourceInterface {
 	
@@ -179,8 +179,8 @@ public class SourceInterfaceImpl implements SourceInterface {
 	 * @see com.orange.labs.uk.omtp.source.SourceInterface#requestCloseNut()
 	 */
 	@Override
-	public void requestCloseNut() {
-		mDependencyResolver.getRequestor().closeNut();
+	public void requestCloseNutAsync() {
+		mDependencyResolver.getRequestor().closeNutAsync();
 	}
 
 	/*

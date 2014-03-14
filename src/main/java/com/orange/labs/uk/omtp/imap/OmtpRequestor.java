@@ -36,7 +36,7 @@ public final class OmtpRequestor {
 		mAccountStore = omtpAccountStoreWrapper;
 	}
 
-	public void closeNut() {
+	public void closeNutAsync() {
 		logger.d("Trying to send XCLOSE_NUT command to IMAP server");
 		mRequestSender.closeNutRequest(new OmtpXcloseNutRequestorCallback());
 	}
