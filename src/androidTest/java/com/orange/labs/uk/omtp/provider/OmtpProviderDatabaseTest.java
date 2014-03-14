@@ -86,7 +86,7 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		assertTrue(inserted);
 		NUMBER_OF_PROVIDERS_INSERTED++;
 		
-		OmtpProviderInfo providerInfoRetrieved = mProviderDb.getProviderInfo(PROVIDER_NAME);
+		OmtpProviderInfo providerInfoRetrieved = mProviderDb.getProviderInfoByName(PROVIDER_NAME);
 		
 		assertNotNull(providerInfoRetrieved);
 		
@@ -127,7 +127,7 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		assertTrue(updated);
 		assertEquals(NUMBER_OF_PROVIDERS_INSERTED, mProviderDb.getProvidersInfoWithNetworkOperator(NETWORK_OPERATOR2).size());
 		
-		OmtpProviderInfo retrievedProviderInfo = mProviderDb.getProviderInfo(PROVIDER_NAME);
+		OmtpProviderInfo retrievedProviderInfo = mProviderDb.getProviderInfoByName(PROVIDER_NAME);
 
 		
 		assertNotNull(retrievedProviderInfo);
@@ -151,13 +151,13 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		assertTrue(inserted);
 		NUMBER_OF_PROVIDERS_INSERTED++;
 		
-		providerInfo = mProviderDb.getProviderInfo(PROVIDER_NAME);
+		providerInfo = mProviderDb.getProviderInfoByName(PROVIDER_NAME);
 		assertNotNull(providerInfo);
 		
 		boolean removed = mProviderDb.removeProviderInfo(providerInfo);
 		assertTrue(removed);
 		
-		providerInfo = mProviderDb.getProviderInfo(PROVIDER_NAME);
+		providerInfo = mProviderDb.getProviderInfoByName(PROVIDER_NAME);
 		assertNull(providerInfo);
 		
 		// Remove non existing provider
@@ -201,7 +201,7 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		assertEquals(true, providerInfo.isCurrentProvider());
 		
 		// The other one should be set as non current 
-		assertEquals(false, mProviderDb.getProviderInfo(PROVIDER_NAME2).isCurrentProvider());
+		assertEquals(false, mProviderDb.getProviderInfoByName(PROVIDER_NAME2).isCurrentProvider());
 		
 		// Test get current provider when true is set
 		providerInfo = mProviderDb.getCurrentProviderInfoWithNetworkOperator(NETWORK_OPERATOR);

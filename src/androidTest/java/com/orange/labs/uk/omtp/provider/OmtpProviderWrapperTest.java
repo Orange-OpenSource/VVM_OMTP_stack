@@ -71,8 +71,7 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 		mStackDependencyResolver = StackDependencyResolverImpl.initialize(getContext());
 		mProviderWrapper = new OmtpProviderWrapperImpl(new OmtpProviderDatabase(
 				mStackDependencyResolver.getProviderDatabaseHelper()), 
-				mStackDependencyResolver.getTelephonyManager(), 
-				mStackDependencyResolver.getSingleExecutorService());
+				mStackDependencyResolver.getTelephonyManager());
 		
 		// Clean provider list
 		try {

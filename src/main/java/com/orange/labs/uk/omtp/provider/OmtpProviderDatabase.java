@@ -47,21 +47,28 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 		mDatabaseHelper = dbHelper;
 	}
 
+    /**
+     * Get a provider by name
+     *
+     * @param providerName
+     * @return
+     */
 	@Override
 	@Nullable
-	public synchronized OmtpProviderInfo getProviderInfo(String providerName) {
+	public OmtpProviderInfo getProviderInfoByName(String providerName) {
 		return getProviderInfo(OmtpProviderColumns.PROVIDER_NAME, providerName);
 	}
-	
+
+    /**
+     * Get a provider for an operator and set as current
+     * Will return the first one found if it exists
+     *
+     * @param networkOperator
+     * @return
+     */
 	@Override
 	@Nullable
-	public synchronized OmtpProviderInfo getProviderInfoWithNetworkOperator(String networkOperator) {
-		return getProviderInfo(OmtpProviderColumns.NETWORK_OPERATOR, networkOperator);
-	}
-	
-	@Override
-	@Nullable
-	public synchronized OmtpProviderInfo getCurrentProviderInfoWithNetworkOperator(String networkOperator) {
+	public OmtpProviderInfo getCurrentProviderInfoWithNetworkOperator(String networkOperator) {
 		// First try to get the provider using the is current provider flag
 		OmtpProviderColumns[] columns = {
 				OmtpProviderColumns.NETWORK_OPERATOR,
@@ -70,30 +77,41 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 				networkOperator,
 				"1"};
 		OmtpProviderInfo providerInfo = getProviderInfo(columns, values);
-		
-		// In case it fails, return the first provider we can find corresponding to the network operator, we can't really fail, provider is important...
-		if(providerInfo == null) {
-			OmtpProviderInfo providerInfoCompatible = getProviderInfoWithNetworkOperator(networkOperator);
-			// If we get it, set it as current one
-			if(providerInfoCompatible != null) {
-				OmtpProviderInfo.Builder builder = new OmtpProviderInfo.Builder();
-				builder.setFieldsFromProvider(providerInfoCompatible);
-				builder.setIsCurrentProvider(true);
-				providerInfo = builder.build();
 
-                // Set this provider as the current one
-				updateProviderInfo(providerInfo);
-			}
-		}
 		return providerInfo;
 	}
-	
+
+    /**
+     * Return a list of providers for an operator
+     *
+     * @param networkOperator Network operator name
+     * @return
+     */
 	@Override
 	@Nullable
-	public synchronized List<OmtpProviderInfo> getProvidersInfoWithNetworkOperator(String networkOperator) {
-
+	public List<OmtpProviderInfo> getProvidersInfoWithNetworkOperator(String networkOperator) {
 		return getProvidersInfo(OmtpProviderColumns.NETWORK_OPERATOR, networkOperator);
 	}
+
+    @Override
+    public boolean updateProviderInfo(final OmtpProviderInfo providerInfo) {
+        logger.d(String.format("Inserting/Updating provider information named: %s",
+                providerInfo.getProviderName()));
+
+        // Get Db access
+        SQLiteDatabase database = null;
+        try {
+            database = mDatabaseHelper.getWritableDatabase();
+        } catch (SQLiteException e) {
+            logger.e(String.format("Impossible to get a writable database: %s",
+                    e.getLocalizedMessage()));
+            return false;
+        }
+
+        ContentValues values = getContentValues(providerInfo);
+
+        return database.replace(PROVIDERS_TABLE_NAME, null, values) != -1;
+    }
 	
 	/**
 	 * Returns a cursor allowing to go through a list of Providers filtered on a column with a specific value
@@ -193,6 +211,8 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 	private OmtpProviderInfo getProviderInfo(OmtpProviderColumns column, String value) {
 		// Cursor that will contain the result.
 		Cursor cursor = getCursorProvidersInfo(column, value);
+        if(cursor == null)
+            return null;
 		try {
 			if (cursor.moveToFirst()) {
 				OmtpProviderInfo.Builder builder = new OmtpProviderInfo.Builder();
@@ -250,7 +270,8 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 	}
 	
 	/**
-	 * Retrieve from the database the records corresponding to the provider Provider Name.
+	 * Retrieve from the database the records corresponding to the column/value combination
+     *
 	 * @param column
 	 * @param value
 	 * @return
@@ -274,83 +295,14 @@ public class OmtpProviderDatabase implements OmtpProviderStore {
 		}
 	}
 
-
+    /**
+     * Remove a provider
+     *
+     * @param providerInfo {@link OmtpProviderInfo} to be removed
+     * @return
+     */
     @Override
-    public synchronized boolean updateProviderInfo(final OmtpProviderInfo providerInfo) {
-
-        logger.d(String.format("Inserting/Updating provider information named: %s",
-                providerInfo.getProviderName()));
-
-        // Get Db access
-        SQLiteDatabase database = null;
-        try {
-            database = mDatabaseHelper.getWritableDatabase();
-        } catch (SQLiteException e) {
-            logger.e(String.format("Impossible to get a writable database: %s",
-                    e.getLocalizedMessage()));
-            return false;
-        }
-
-        ContentValues values = getContentValues(providerInfo);
-
-
-        boolean updatedOrInserted = false;
-        String providerName = providerInfo.getProviderName();
-        OmtpProviderInfo providerInfoFromDb = getProviderInfo(providerName);
-        if(providerInfoFromDb == null) {
-            // Insert it
-            updatedOrInserted = database.replace(PROVIDERS_TABLE_NAME, null, values) != -1;
-        }
-        else {
-            // Update the record
-            String query = getEqualityClause(OmtpProviderColumns.PROVIDER_NAME, providerName);
-            updatedOrInserted = (database.update(PROVIDERS_TABLE_NAME, values, query, null) > 0);
-        }
-
-        // Set the others providers as non current if this one is set as current
-        boolean otherProvidersUpdated = true;
-        if(updatedOrInserted) {
-            if(providerInfo.isCurrentProvider()) {
-                // Get all the other providers from the db corresponding to the same operator
-                List<OmtpProviderInfo> providersForSameOperator = getProvidersInfoWithNetworkOperator(providerInfo.getNetworkOperator());
-
-                if(! providersForSameOperator.isEmpty()) {
-                    for (OmtpProviderInfo omtpProviderForSameOperator : providersForSameOperator) {
-                        // If it's not the provider set as current one and it is set as a current one
-                        if(! providerInfo.getProviderName().equals(omtpProviderForSameOperator.getProviderName())
-                                && omtpProviderForSameOperator.isCurrentProvider()) {
-
-                            logger.d(String.format("Making omtp provider non current, %s", omtpProviderForSameOperator));
-                            boolean providerReplaced = replaceProviderInfoAndSetAsNonCurrent(omtpProviderForSameOperator, database);
-                            otherProvidersUpdated = otherProvidersUpdated && providerReplaced;
-                        }
-                    }
-                }
-            }
-        }
-
-        return updatedOrInserted && otherProvidersUpdated;
-    }
-
-    private boolean replaceProviderInfoAndSetAsNonCurrent(OmtpProviderInfo providerInfo, SQLiteDatabase database) {
-        return replaceProviderInfoAndSetIsCurrentProviderValue(providerInfo, database, false);
-    }
-
-    private boolean replaceProviderInfoAndSetIsCurrentProviderValue(OmtpProviderInfo providerInfo, SQLiteDatabase database, boolean isCurrentProvider) {
-        ContentValues values = getContentValues(providerInfo);
-        if(values.containsKey(OmtpProviderColumns.IS_CURRENT_PROVIDER.getColumnName())) {
-            values.put(OmtpProviderColumns.IS_CURRENT_PROVIDER.getColumnName(), isCurrentProvider);
-        }
-
-        // Update the record
-        String query = getEqualityClause(OmtpProviderColumns.PROVIDER_NAME, values.getAsString(OmtpProviderColumns.PROVIDER_NAME.getColumnName()));
-        boolean updated = (database.update(PROVIDERS_TABLE_NAME, values, query, null) > 0);
-
-        return updated;
-    }
-
-    @Override
-    public synchronized boolean removeProviderInfo(OmtpProviderInfo providerInfo) {
+    public boolean removeProviderInfo(OmtpProviderInfo providerInfo) {
 
         if(providerInfo == null) {
             logger.d("Cannot continue removing provider as it is null");

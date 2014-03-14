@@ -59,11 +59,11 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
     }
 
 	/**
-	 * @see OmtpProviderStore#getProviderInfoWithNetworkOperator(String)
+	 * @see OmtpProviderStore#getCurrentProviderInfoWithNetworkOperator(String)
 	 */
 	@Nullable
 	@Override
-	public OmtpProviderInfo getProviderInfo() {
+	public synchronized OmtpProviderInfo getProviderInfo() {
 		OmtpProviderInfo retrievedProvider = null;
 		String networkOperator = getSimOperator();
 		
@@ -83,15 +83,15 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 
     @Override
     @Nullable
-    public OmtpProviderInfo getProviderInfo(String providerName) {
-        OmtpProviderInfo retrievedProvider = mProviderStore.getProviderInfo(providerName);
+    public synchronized OmtpProviderInfo getProviderInfo(String providerName) {
+        OmtpProviderInfo retrievedProvider = mProviderStore.getProviderInfoByName(providerName);
         return retrievedProvider;
     }
 
     /**
      * Returns a list of OMTP providers supported by the SIM
      */
-    public List<OmtpProviderInfo> getSupportedProviders() {
+    public synchronized List<OmtpProviderInfo> getSupportedProviders() {
         String networkOperator = getSimOperator();
         List<OmtpProviderInfo> listSupportedProviders = new ArrayList<OmtpProviderInfo>();
 
@@ -113,7 +113,7 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 	 * @see OmtpProviderWrapper#updateProvidersInfo(ArrayList)
 	 */
 	@Override
-	public boolean updateProvidersInfo(ArrayList<OmtpProviderInfo> providers) {
+	public synchronized boolean updateProvidersInfo(ArrayList<OmtpProviderInfo> providers) {
 		if(providers == null)
 			return false;
 		
@@ -129,11 +129,36 @@ public class OmtpProviderWrapperImpl implements OmtpProviderWrapper {
 	 * @see OmtpProviderWrapper#updateProviderInfo(OmtpProviderInfo)
 	 */
 	@Override
-	public boolean updateProviderInfo(OmtpProviderInfo infos) {
+	public synchronized boolean updateProviderInfo(OmtpProviderInfo infos) {
+        // If the provider is set a current provider
+        if(infos.isCurrentProvider()) {
+
+            // See if there are other providers for the same operator set as current
+            List<OmtpProviderInfo> providersOperator =
+                    mProviderStore.getProvidersInfoWithNetworkOperator(infos.getNetworkOperator());
+
+            for (java.util.Iterator providerInfoIterator = providersOperator.iterator();
+                 providerInfoIterator.hasNext(); ) {
+
+                OmtpProviderInfo providerInfoIter =  (OmtpProviderInfo) providerInfoIterator.next();
+
+                // Other provider, set as current
+                if(! providerInfoIter.getProviderName().equals(infos.getProviderName())
+                        && providerInfoIter.isCurrentProvider()) {
+
+                    // if yes set it as non current
+                    OmtpProviderInfo.Builder builder = new  OmtpProviderInfo.Builder();
+                    builder.setFieldsFromProvider(providerInfoIter);
+                    builder.setIsCurrentProvider(false);
+                    providerInfoIter = builder.build();
+                    mProviderStore.updateProviderInfo(providerInfoIter);
+                }
+            }
+        }
         return mProviderStore.updateProviderInfo(infos);
 	}
 
-	public boolean removeProviderInfo(OmtpProviderInfo infos) {
+	public synchronized boolean removeProviderInfo(OmtpProviderInfo infos) {
         return mProviderStore.removeProviderInfo(infos);
     }
 }

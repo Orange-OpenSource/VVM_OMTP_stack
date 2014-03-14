@@ -31,14 +31,7 @@ public interface OmtpProviderStore {
 	 * @param	Provider Name
 	 */
 	@Nullable
-	public OmtpProviderInfo getProviderInfo(String providerName);
-
-	/**
-	 * Retrieves the {@link OmtpProviderInfo} corresponding to the provided Network Operator. If
-	 * none can be found, Null is returned.
-	 */
-	@Nullable
-	public OmtpProviderInfo getProviderInfoWithNetworkOperator(String networkOperator);
+	public OmtpProviderInfo getProviderInfoByName(String providerName);
 
     /**
      * Retrieves the provider set as current for the specified operator
