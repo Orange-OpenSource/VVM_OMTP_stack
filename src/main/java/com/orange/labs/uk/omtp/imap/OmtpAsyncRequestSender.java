@@ -1,15 +1,15 @@
 package com.orange.labs.uk.omtp.imap;
 
-import java.util.concurrent.Executor;
-
-import javax.annotation.Nullable;
-
 import android.content.Context;
 
 import com.android.email.mail.MessagingException;
 import com.orange.labs.uk.omtp.account.OmtpAccountInfo;
 import com.orange.labs.uk.omtp.account.OmtpAccountStoreWrapper;
 import com.orange.labs.uk.omtp.callbacks.Callback;
+
+import java.util.concurrent.Executor;
+
+import javax.annotation.Nullable;
 
 /**
  *	Issue OMTP request to the platform asynchronously.
@@ -27,23 +27,28 @@ public class OmtpAsyncRequestSender implements OmtpRequestSender {
 		mAccountStore = accountStore;
 	}
 
+    //TODO: some methods as this one are shared between command issuer and voicemail fetcher.
+    private OmtpAccountInfo getAccountDetails() {
+        return mAccountStore.getAccountInfo();
+    }
+
 	/**
 	 * @see OmtpRequestSender#closeNutRequest(Callback)
 	 */
 	@Override
 	public void closeNutRequest(final Callback<Void> callback) {
-		final OmtpAccountInfo accountDetails = getAccountDetails();
-		if (accountDetails == null) {
-			// Could not fetch account details. Fail!
-			callback.onFailure(new Exception(
-					"closeNutRequest failed, we can't get AccountDetails"));
-			return;
-		}
-		
 		mExecutor.execute(new Runnable() {
 			
 			@Override
 			public void run() {
+                final OmtpAccountInfo accountDetails = getAccountDetails();
+                if (accountDetails == null) {
+                    // Could not fetch account details. Fail!
+                    callback.onFailure(new Exception(
+                            "closeNutRequest failed, we can't get AccountDetails"));
+                    return;
+                }
+
 				OmtpImapStore store = getImapStore(accountDetails);
 				if (store != null) {
 					store.closeNutRequest(callback);
@@ -57,22 +62,24 @@ public class OmtpAsyncRequestSender implements OmtpRequestSender {
 	}
 
 	/**
-	 * @see OmtpRequestSender#changeTuiPassword(int, int, Callback)
+	 * @see OmtpRequestSender#changeTuiPassword(String, String, Callback<Void>)
 	 */
 	@Override
 	public void changeTuiPassword(final String oldPassword, final String newPassword,
 			final Callback<Void> callback) {
-		final OmtpAccountInfo accountDetails = getAccountDetails();
-		if (accountDetails == null) {
-			// Could not fetch account details. Fail!
-			callback.onFailure(new Exception(
-					"changeTuiLanguage failed, we can't get AccountDetails"));
-			return;
-		}
+
 		mExecutor.execute(new Runnable() {
 			
 			@Override
 			public void run() {
+                final OmtpAccountInfo accountDetails = getAccountDetails();
+                if (accountDetails == null) {
+                    // Could not fetch account details. Fail!
+                    callback.onFailure(new Exception(
+                            "changeTuiLanguage failed, we can't get AccountDetails"));
+                    return;
+                }
+
 				OmtpImapStore store = getImapStore(accountDetails);
 				if (store != null) {
 					store.changeTuiPassword(oldPassword, newPassword, callback);
@@ -83,11 +90,7 @@ public class OmtpAsyncRequestSender implements OmtpRequestSender {
 			}
 		});
 	}
-	
-	//TODO: some methods as this one are shared between command issuer and voicemail fetcher.
-	private OmtpAccountInfo getAccountDetails() {
-		return mAccountStore.getAccountInfo();
-	}
+
 	
 	/**
 	 * Returns a new {@link OmtpImapStore} used to send the requests to the server, or null if it
