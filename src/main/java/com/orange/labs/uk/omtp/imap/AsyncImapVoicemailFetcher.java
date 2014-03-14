@@ -15,11 +15,6 @@
  */
 package com.orange.labs.uk.omtp.imap;
 
-import java.util.List;
-import java.util.concurrent.Executor;
-
-import javax.annotation.concurrent.ThreadSafe;
-
 import android.content.Context;
 
 import com.android.email.mail.MessagingException;
@@ -35,6 +30,11 @@ import com.orange.labs.uk.omtp.notification.SourceNotifier;
 import com.orange.labs.uk.omtp.voicemail.Voicemail;
 import com.orange.labs.uk.omtp.voicemail.VoicemailPayload;
 
+import java.util.List;
+import java.util.concurrent.Executor;
+
+import javax.annotation.concurrent.ThreadSafe;
+
 /**
  * Asynchronous fetcher for voicemail from an IMAP server.
  */
@@ -44,7 +44,6 @@ public class AsyncImapVoicemailFetcher implements VoicemailFetcher {
 	private final Executor mExecutor;
 	private final OmtpAccountStoreWrapper mAccountStore;
 	private final SourceNotifier mSourceNotifier;
-	protected GreetingsHelper mGreetingsHelper;
 
 	/**
 	 * The {@link Context} is required for handing to the underlying imap code,
@@ -58,121 +57,118 @@ public class AsyncImapVoicemailFetcher implements VoicemailFetcher {
 		mSourceNotifier = notifier;
 	}
 
+    private OmtpAccountInfo getAccountDetailsOrFail(final Callback<?> callback) {
+        OmtpAccountInfo accountInfo = mAccountStore.getAccountInfo();
+        if (accountInfo == null) {
+            callback.onFailure(new MessagingException(
+                    "Imap Operation Failed - failed, Cannot get AccountDetails"));
+        }
+
+        return accountInfo;
+    }
+
 	@Override
 	public void fetchAllVoicemails(final Callback<List<Voicemail>> callback) {
-		final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
-		if (accountDetails != null) {
-			mExecutor.execute(new Runnable() {
-				@Override
-				public void run() {
-					new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
-							.fetchAllVoicemails(callback);
-				}
-			});
-		}
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
+                if(accountDetails != null) {
+                    new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
+                            .fetchAllVoicemails(callback);
+                }
+            }
+        });
 	}
 
 	@Override
 	public void fetchVoicemailPayload(final String providerData,
-			final Callback<VoicemailPayload> callback) {
-		final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
-		if (accountDetails != null) {
-			mExecutor.execute(new Runnable() {
-				@Override
-				public void run() {
-					new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
-							.fetchVoicemailPayload(providerData, callback);
-				}
-			});
-		}
+                                      final Callback<VoicemailPayload> callback) {
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+            final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
+            if (accountDetails != null) {
+                new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
+                        .fetchVoicemailPayload(providerData, callback);
+            }
+            }
+        });
 	}
 
 	@Override
 	public void markVoicemailsAsRead(final Callback<Void> callback, final Voicemail... voicemails) {
-		final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
-		if (accountDetails != null) {
-			mExecutor.execute(new Runnable() {
-				@Override
-				public void run() {
-					new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
-							.markVoicemailsAsRead(callback, voicemails);
-				}
-			});
-		}
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
+                if (accountDetails != null) {
+                    new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
+                            .markVoicemailsAsRead(callback, voicemails);
+                }
+            }
+        });
 	}
 
 	@Override
 	public void markVoicemailsAsDeleted(final Callback<Void> callback,
 			final Voicemail... voicemails) {
-		final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
-		if (accountDetails != null) {
-			mExecutor.execute(new Runnable() {
-				@Override
-				public void run() {
-					new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
-							.markVoicemailsAsDeleted(callback, voicemails);
-				}
-			});
-		}
-	}
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
+                if (accountDetails != null) {
+                    new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
+                            .markVoicemailsAsDeleted(callback, voicemails);
+                }
+            }
+        });
+    }
 
-	private OmtpAccountInfo getAccountDetailsOrFail(final Callback<?> callback) {
-		OmtpAccountInfo accountInfo = mAccountStore.getAccountInfo();
-		if (accountInfo == null) {
-			callback.onFailure(new MessagingException(
-					"Imap Operation Failed - failed, Cannot get AccountDetails"));
-		}
 
-		return accountInfo;
-	}
 
 	@Override
 	public void uploadGreetings(final Callback<Greeting> callback,
 			final GreetingUpdateType operationType, final GreetingType greetingType,
 			final GreetingsHelper greetingsHelper) {
-		final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
-		if (accountDetails != null) {
-			mExecutor.execute(new Runnable() {
-				@Override
-				public void run() {
-					new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
-							.uploadGreetings(callback, operationType, greetingType, greetingsHelper);
-				}
-			});
-		}
-		
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
+                if (accountDetails != null) {
+                    new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
+                            .uploadGreetings(callback, operationType, greetingType, greetingsHelper);
+                }
+            }
+        });
 	}
 
 	@Override
 	public void fetchAllGreetings(final Callback<List<Greeting>> callback) {
-		final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
-		if (accountDetails != null) {
-			mExecutor.execute(new Runnable() {
-				@Override
-				public void run() {
-					new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
-							.fetchAllGreetings(callback);
-				}
-			});
-		}
-		
-		
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
+                if (accountDetails != null) {
+                    new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
+                            .fetchAllGreetings(callback);
+                }
+            }
+        });
 	}
 
 	@Override
-	public void fetchGreetingPayload(final Callback<VoicemailPayload> callback, final Greeting greeting) 
-			 {
-		final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
-		if (accountDetails != null) {
-			mExecutor.execute(new Runnable() {
-				@Override
-				public void run() {
-					new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
-							.fetchGreetingPayload(callback, greeting);
-				}
-			});
-		}
-		
+	public void fetchGreetingPayload(final Callback<VoicemailPayload> callback,
+                                     final Greeting greeting) {
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final OmtpAccountInfo accountDetails = getAccountDetailsOrFail(callback);
+                if (accountDetails != null) {
+                    new OneshotSyncImapVoicemailFetcher(mContext, accountDetails, mSourceNotifier)
+                            .fetchGreetingPayload(callback, greeting);
+                }
+            }
+        });
 	}
-
 }
