@@ -27,13 +27,13 @@ import javax.annotation.Nullable;
 public interface OmtpProviderWrapper {
 
     /**
-     * @see OmtpProviderStore#getProviderInfoWithNetworkOperator(String)
+     * Return the current provider
      */
     @Nullable
     public OmtpProviderInfo getProviderInfo();
 
     /**
-     * @see OmtpProviderStore#getProviderInfo(String)
+     * @see OmtpProviderStore#getProviderInfoByName(String)
      */
     @Nullable
     public OmtpProviderInfo getProviderInfo(String providerName);
