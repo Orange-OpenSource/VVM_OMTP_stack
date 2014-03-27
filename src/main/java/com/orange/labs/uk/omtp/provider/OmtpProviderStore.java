@@ -35,7 +35,6 @@ public interface OmtpProviderStore {
 
     /**
      * Retrieves the provider set as current for the specified operator
-     * If there is one for the network operator, but not set as current, set it as the current one
      *
      * @param networkOperator Network operator identifier
      * @return {@link OmtpProviderInfo}
