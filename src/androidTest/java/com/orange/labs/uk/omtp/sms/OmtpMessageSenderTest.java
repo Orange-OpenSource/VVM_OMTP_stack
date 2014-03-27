@@ -1,16 +1,17 @@
 package com.orange.labs.uk.omtp.sms;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import android.telephony.SmsManager;
 import android.test.AndroidTestCase;
 
 import com.orange.labs.uk.omtp.account.OmtpAccountInfoTest;
-import com.orange.labs.uk.omtp.dependency.StackDependencyResolverImpl;
 import com.orange.labs.uk.omtp.dependency.StackDependencyResolver;
+import com.orange.labs.uk.omtp.dependency.StackDependencyResolverImpl;
 import com.orange.labs.uk.omtp.provider.OmtpProviderInfoTest;
 import com.orange.labs.uk.omtp.proxy.OmtpSmsManagerProxyImpl;
+import com.orange.labs.uk.omtp.sms.timeout.SmsTimeoutHandlerImpl;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class OmtpMessageSenderTest extends AndroidTestCase {
 
@@ -32,10 +33,14 @@ public class OmtpMessageSenderTest extends AndroidTestCase {
 		ExecutorService executorService = Executors.newCachedThreadPool();
 		omtpDependencyResolver = StackDependencyResolverImpl.getInstance();
 
-		omtpMessageSender = new OmtpMessageSenderImpl(new OmtpSmsManagerProxyImpl(
-				SmsManager.getDefault()), omtpDependencyResolver.getAccountStore(),
+		omtpMessageSender = new OmtpMessageSenderImpl(
+                new OmtpSmsManagerProxyImpl(SmsManager.getDefault()),
+                new SmsTimeoutHandlerImpl(),
+                omtpDependencyResolver.getAccountStore(),
 				omtpDependencyResolver.getProviderStore().getProviderInfo(),
-				omtpDependencyResolver.getSourceNotifier(), getContext(), executorService);
+				omtpDependencyResolver.getSourceNotifier(),
+                getContext(),
+                executorService);
 	}
 
 	public void testRequestVvmActivation() {

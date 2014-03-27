@@ -179,43 +179,31 @@ public class OmtpProviderDatabaseTest extends AndroidTestCase {
 		builder.setIsCurrentProvider(false);
 		boolean inserted = mProviderDb.updateProviderInfo(builder.build());
 		assertTrue(inserted);
-		
+
+        providerInfo = mProviderDb.getCurrentProviderInfoWithNetworkOperator(NETWORK_OPERATOR);
+        assertNull(providerInfo);
+
+        // Add another provider for this network but set as current
 		builder.setFieldsFromProvider(buildSecondProviderInfoWithValidValues());
-		builder.setIsCurrentProvider(false);
 		builder.setNetworkOperator(NETWORK_OPERATOR);
 		inserted = mProviderDb.updateProviderInfo(builder.build());
 		assertTrue(inserted);
 
 		providerInfo = mProviderDb.getCurrentProviderInfoWithNetworkOperator(NETWORK_OPERATOR);
-		assertNotNull(providerInfo);
-		// Check values
-		// Should return the first one inserted and be set as current one
-		assertEquals(PROVIDER_NAME, providerInfo.getProviderName());
-		assertEquals(PROTOCOL_VERSION, providerInfo.getProtocolVersion());
-		assertEquals(CLIENT_TYPE, providerInfo.getClientType());
-		assertEquals(SMS_DESTINATION_NUMBER, providerInfo.getSmsDestinationNumber());
-		assertEquals(SMS_DESTINATION_PORT, providerInfo.getSmsDestinationPort());
-        assertEquals(SMS_SERVICE_CENTER, providerInfo.getSmsServiceCenter());
-        assertEquals(NETWORK_OPERATOR, providerInfo.getNetworkOperator());
-		assertEquals(DATE_FORMAT, providerInfo.getDateFormat());
-		assertEquals(true, providerInfo.isCurrentProvider());
-		
-		// The other one should be set as non current 
-		assertEquals(false, mProviderDb.getProviderInfoByName(PROVIDER_NAME2).isCurrentProvider());
-		
+        assertNotNull(providerInfo);
+
 		// Test get current provider when true is set
-		providerInfo = mProviderDb.getCurrentProviderInfoWithNetworkOperator(NETWORK_OPERATOR);
-		assertNotNull(providerInfo);
+
 		// Check values
 		// Should return the first one inserted and be set as current one
-		assertEquals(PROVIDER_NAME, providerInfo.getProviderName());
-		assertEquals(PROTOCOL_VERSION, providerInfo.getProtocolVersion());
-		assertEquals(CLIENT_TYPE, providerInfo.getClientType());
-		assertEquals(SMS_DESTINATION_NUMBER, providerInfo.getSmsDestinationNumber());
-		assertEquals(SMS_DESTINATION_PORT, providerInfo.getSmsDestinationPort());
-        assertEquals(SMS_SERVICE_CENTER, providerInfo.getSmsServiceCenter());
+		assertEquals(PROVIDER_NAME2, providerInfo.getProviderName());
+		assertEquals(PROTOCOL_VERSION2, providerInfo.getProtocolVersion());
+		assertEquals(CLIENT_TYPE2, providerInfo.getClientType());
+		assertEquals(SMS_DESTINATION_NUMBER2, providerInfo.getSmsDestinationNumber());
+		assertEquals(SMS_DESTINATION_PORT2, providerInfo.getSmsDestinationPort());
+        assertEquals(SMS_SERVICE_CENTER2, providerInfo.getSmsServiceCenter());
         assertEquals(NETWORK_OPERATOR, providerInfo.getNetworkOperator());
-		assertEquals(DATE_FORMAT, providerInfo.getDateFormat());
+		assertEquals(DATE_FORMAT2, providerInfo.getDateFormat());
 		assertEquals(true, providerInfo.isCurrentProvider());
 	}
 	

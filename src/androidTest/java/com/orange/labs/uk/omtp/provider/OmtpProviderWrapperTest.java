@@ -104,22 +104,7 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 		
 		// Get current provider
 		OmtpProviderInfo currentProviderInfo = mProviderWrapper.getProviderInfo();
-		assertNotNull(currentProviderInfo);
-		
-		// Assert if the retrieved object corresponds. Should be the first on inserted
-		assertEquals(PROVIDER_NAME, currentProviderInfo.getProviderName());
-		assertEquals(PROTOCOL_VERSION, currentProviderInfo.getProtocolVersion());
-		assertEquals(CLIENT_TYPE, currentProviderInfo.getClientType());
-		assertEquals(SMS_DESTINATION_NUMBER, currentProviderInfo.getSmsDestinationNumber());
-		assertEquals(SMS_DESTINATION_PORT, currentProviderInfo.getSmsDestinationPort());
-        assertEquals(SMS_SERVICE_CENTER, currentProviderInfo.getSmsServiceCenter());
-		assertEquals(NETWORK_OPERATOR, currentProviderInfo.getNetworkOperator());
-		assertEquals(DATE_FORMAT, currentProviderInfo.getDateFormat());
-		// Should now be set as current
-		assertTrue(currentProviderInfo.isCurrentProvider());
-		
-		// The other one should be set an non current
-		assertFalse(mProviderWrapper.getProviderInfo(PROVIDER_NAME2).isCurrentProvider());
+		assertNull(currentProviderInfo);
 	}
 	
 	// Get provider info with provider name
@@ -148,14 +133,17 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
 	
 	public void testRemoveProviderInfo() {
 		assertFalse(mProviderWrapper.removeProviderInfo(null));
+
+        // Does not exists
 		assertFalse(mProviderWrapper.removeProviderInfo(buildProviderInfoWithValidValues()));
-		
+
+        // Add a provider
 		OmtpProviderInfo providerInfo = buildProviderInfoWithValidValues();
 		mProviderWrapper.updateProviderInfo(providerInfo);
+
+        // Remove provider not inserted
 		assertFalse(mProviderWrapper.removeProviderInfo(buildSecondProviderInfoWithValidValues()));
-		assertNotNull(mProviderWrapper.getProviderInfo());
 		assertTrue(mProviderWrapper.removeProviderInfo(providerInfo));
-		assertNull(mProviderWrapper.getProviderInfo());
 		assertFalse(mProviderWrapper.removeProviderInfo(providerInfo));
 	}
 	
@@ -203,7 +191,7 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
         builder.setSmsServiceCenter(SMS_SERVICE_CENTER);
         builder.setNetworkOperator(NETWORK_OPERATOR);
 		builder.setDateFormat(DATE_FORMAT);
-		builder.setIsCurrentProvider(IS_CURRENT_PROVIDER);
+		builder.setIsCurrentProvider(true);
 		OmtpProviderInfo providerUpdated = builder.build();
 		
 		assertTrue(mProviderWrapper.updateProviderInfo(providerUpdated));
@@ -219,8 +207,25 @@ public class OmtpProviderWrapperTest extends AndroidTestCase {
         assertEquals(providerUpdated.getNetworkOperator(), providerUpdatedInDb.getNetworkOperator());
 		assertEquals(providerUpdated.getDateFormat(), providerUpdatedInDb.getDateFormat());
 		assertEquals(providerUpdated.isCurrentProvider(), providerUpdatedInDb.isCurrentProvider());
-		
-	}
+
+        // For the same operator, we should have only one provider enabled
+        // Enable also the first provider inserted
+        builder = new OmtpProviderInfo.Builder();
+        builder.setFieldsFromProvider(providerInfoInserted);
+        builder.setIsCurrentProvider(true);
+        providerInfoInserted = builder.build();
+        // Update it
+        assertTrue(mProviderWrapper.updateProviderInfo(providerInfoInserted));
+        assertEquals(true, providerInfoInserted.isCurrentProvider());
+
+        // Get the other provider which should have been updated
+        providerUpdatedInDb = mProviderWrapper.getProviderInfo(providerUpdated.getProviderName());
+        assertNotNull(providerUpdatedInDb);
+        assertEquals(false, providerUpdatedInDb.isCurrentProvider());
+
+
+
+    }
 	
 	public void testUpdateProvidersInfo() {
 		assertFalse(mProviderWrapper.updateProvidersInfo(null));
