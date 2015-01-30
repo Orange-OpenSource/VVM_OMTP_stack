@@ -1,0 +1,3 @@
+Fork of original work from Google at https://code.google.com/p/voicemail-example-for-android
+Heavily modified to make it work in production by Orange.
+Need to be plugged to a Source, here not provided as not open-sourced so far.
