@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 Orange Labs UK. All Rights Reserved.
+ * Copyright (C) 2011 Google
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
